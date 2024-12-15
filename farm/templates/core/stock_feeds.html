@@ -1,0 +1,143 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="main-content">
+  <section class="section">
+    <div class="section-body">
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h4>Stock Feeds</h4>
+            </div>
+            <div class="card-body">
+              <form method="POST" action=".">
+                {% csrf_token %}
+                <div class="form-group row mb-4">
+                  <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Feed Type</label>
+                  <div class="col-sm-12 col-md-7">
+                    <select name="feed_types" class="form-control phone-number" style="height: 40px;">
+                      <option value="">---select type---</option>
+                      {% for code, name in feed_types %} 
+                      <option value="{{ code }}">{{ name }}</option> 
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group row mb-4">
+                  <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Supplier Name</label>
+                  <div class="col-sm-12 col-md-7">
+                    <input type="text" name="supplier_name" class="form-control">
+                  </div>
+                </div>
+                <div class="form-group row mb-4">
+                  <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Supplier Contact</label>
+                  <div class="col-sm-12 col-md-7">
+                    <input type="text" name="supplier_contact" class="form-control">
+                  </div>
+                </div>
+                <div class="form-group row mb-4">
+                  <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Supplier Phone</label>
+                  <div class="col-sm-12 col-md-7">
+                    <input type="text" name="supplier_phone" class="form-control">
+                  </div>
+                </div>
+                <div class="form-group row mb-4">
+                  <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Purchase Date</label>
+                  <div class="col-sm-12 col-md-7">
+                    <input type="date" name="purchase_date"  class="form-control">
+                  </div>
+                </div>
+                <div class="form-group row mb-4">
+                  <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Expiry Date</label>
+                  <div class="col-sm-12 col-md-7">
+                    <input type="date" name="expiration_date" class="form-control">
+                  </div>
+                </div>
+                <div class="form-group row mb-4">
+                  <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Quantity</label>
+                  <div class="col-sm-12 col-md-7">
+                    <input type="text" name="quantity" class="form-control">
+                  </div>
+                </div>
+                <div class="form-group row mb-4">
+                  <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Unit of Measurement</label>
+                  <div class="col-sm-12 col-md-7">
+                    <select name="units" class="form-control phone-number" style="height: 40px;">
+                      <option value="">---select---</option>
+                      {% for code, name in units %} 
+                      <option value="{{ code }}">{{ name }}</option> 
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group row mb-4">
+                  <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Cost per Unit</label>
+                  <div class="col-sm-12 col-md-7">
+                    <input type="text" name="cost_per_unit" class="form-control">
+                  </div>
+                </div>
+                <div class="form-group row mb-4">
+                  <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Stock Notes</label>
+                  <div class="col-sm-12 col-md-7">
+                    <textarea name="notes" class="form-control" ></textarea>
+                  </div>
+                </div>
+                <div class="card-footer text-center">
+                  <button type="submit" class="btn btn-primary" style="background-color: green;">Save</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h4>Show Records</h4>
+            </div>
+            <div class="card-body">
+              <table border="2">
+                <div class="form-group row mb-4">
+                <tr>
+                  <th>Feed ID</th>
+                  <th>Feed Type</th>
+                  <th>Quantity</th>
+                  <th>Unit of Measurement</th>
+                  <th>Supplier Name</th>
+                  <th>Supplier Personnel</th>
+                  <th>Purchase Date</th>
+                  <th>Cost per Unit</th>
+                  <th>Total Cost</th> 
+                  <th>Delete</th> 
+                </tr>
+                </div>
+                <div class="form-group row mb-4">
+                  {% for feed in feeds %}
+                  <tr>
+                    <td>{{ feed.feed_id }}</td>
+                    <td>{{ feed.feed_type }}</td>
+                    <td>{{ feed.quantity }}</td>
+                    <td>{{ feed.unit_of_measurement }}</td>
+                    <td>{{ feed.supplier_name }}</td>
+                    <td>{{ feed.supplier_contact }}</td>
+                    <td>{{ feed.purchase_date }}</td>
+                    <td>{{ feed.cost_per_unit }}</td>
+                    <td>{{ feed.total_feed_cost }}</td>
+                    <td><a class="btn btn-danger btn-xs" href="{% url 'core:feed-records-delete' feed.feed_id %}"><span class="glyphicon glyphicon-trash"></span></a><br><br>
+                  </tr>
+                </div>
+                {% endfor %}
+              </table>  
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>  
+  </section>
+</div>
+
+{% endblock content %}

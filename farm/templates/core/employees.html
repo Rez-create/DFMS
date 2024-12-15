@@ -1,0 +1,104 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="main-content">
+  <section class="section">
+    <div class="section-body">
+      <div class="row">
+        <div class="col-12 col-md-6 col-lg-6">
+          <div class="card">
+              <div class="card-header">
+                <h4>Employee Details</h4>
+              </div>
+              <div class="card-body">
+                <form method="POST" action=".">
+                  {% csrf_token %}
+                  <div class="form-group">
+                    <label>Employee ID No.</label>
+                    <input type="text" name="employee_id" class="form-control" required="">
+                  </div>
+                  <div class="form-group">
+                    <label>Employee Name</label>
+                    <input type="text" name="employee_name" class="form-control" required="">
+                  </div>
+                  <div class="form-group mb-0">
+                    <label>Gender</label><br>
+                    <input name="gender" type="radio" id="male" name="gender" value="male">
+                    <label for="male">Male</label><br>
+                    <input name="gender" type="radio" id="female" name="gender" value="female">
+                    <label for="female">Female</label>
+                  </div><br>
+                  <div class="form-group">
+                    <label>Contact Number</label>
+                    <input type="text" name="phone_number" class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label>Address</label>
+                    <input type="text" name="address" class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label>Designation</label>
+                    <select id="designation" name="designation_type" class="form-control phone-number" style="height: 40px;">
+                      <option value="">---select---</option>
+                      {% for code, name in designation_type %} 
+                      <option value="{{ code }}">{{ name }}</option> 
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Date Hired</label>
+                    <input type="date" name="date_hired" class="form-control">
+                  </div>
+                  <div class="card-footer text-center">
+                    <button type="submit" class="btn btn-primary" style="background-color: green;">Save</button>
+                  </div>
+                </form>
+              </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h4>Employee Records</h4>
+            </div>
+            <div class="card-body">
+              <table border="2">
+                <div class="form-group row mb-4">
+                <tr>
+                  <th>Employee ID No.&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                  <th>Employee Name&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                  <th>Gender&nbsp;&nbsp;&nbsp;&nbsp;</th> 
+                  <th>Phone Number&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                  <th>Designation&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                  <th>Date Hired</th>
+                  <th>Delete</th>
+                </tr>
+                </div>
+                <div class="form-group row mb-4">
+                  {% for employee in employees %}
+                  <tr>
+                    <td>{{ employee.employee_id }}</td>
+                    <td>{{ employee.employee_name }}</td>
+                    <td>{{ employee.gender }}</td>
+                    <td>{{ employee.phone_number }}</td>
+                    <td>{{ employee.designation }}</td>
+                    <td>{{ employee.date_hired }}</td>
+                    <td><a class="btn btn-danger btn-xs" href="{% url 'core:employee-records-delete' employee.employee_id %}"><span class="glyphicon glyphicon-trash"></span></a><br><br>
+                  </tr>
+                  {% endfor %}
+                </div>
+              </table>  
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+{% endblock content %}
+  

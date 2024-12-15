@@ -1,0 +1,130 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+
+<!-- auth-register.html  21 Nov 2019 04:05:01 GMT -->
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
+  <title>Sang's Dairy Farm Management System</title>
+  <!-- General CSS Files -->
+  <link rel="stylesheet" href="{% static 'css/app.min.css' %}">
+  <link rel="stylesheet" href="{% static 'bundles/jquery-selectric/selectric.css' %}">
+  <!-- Template CSS -->
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}">
+  <!-- Custom style CSS -->
+  <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+  <link rel='shortcut icon' type='image/x-icon' href='img/favicon.ico' />
+</head>
+
+<body>
+  <div class="loader"></div>
+  <div id="app">
+    <section class="section">
+      <div class="container mt-5">
+        <h2 style="text-align: center;">Hello, welcome to Sang's Dairy Farm Management System. Create an account to get started.</h2><br>
+        <div class="row">
+          <div class="col-12 col-sm-10 offset-sm-1 col-md-8 offset-md-2 col-lg-8 offset-lg-2 col-xl-8 offset-xl-2">
+            <div class="card card-primary">
+              <div class="card-header">
+                <h3><strong>Register</strong></h3>
+              </div>
+              <div class="card-body">
+                {% if form.errors or form.non_field_errors %}
+                    <div class="mb-3 p-6 bg-red-100 rounded-xl">
+                        {% for field in form %}
+                            {{ field.errors }}
+                        {% endfor %}
+
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+                <form method="POST" action=".">
+                    {% csrf_token %}
+                  
+                  <div class="form-group">
+                    <label for="email"><strong>Full Name</strong></label>
+                    <input id="email" type="text" name="full_name" placeholder="Your full name" class="form-control">
+                    <div class="invalid-feedback">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="username"><strong>Username</strong></label>
+                    <input id="username" type="text" name="username" placeholder="Your username" class="form-control">
+                    <div class="invalid-feedback">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="email"><strong>Email</strong></label>
+                    <input id="email" type="email" class="form-control" name="email" placeholder="Your email address">
+                    <div class="invalid-feedback">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="phone"><strong>Phone</strong></label>
+                    <input id="phone" type="text" class="form-control" name="phone" placeholder="07...">
+                    <div class="invalid-feedback">
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="form-group col-6">
+                      <label for="password" class="d-block"><strong>Password</strong></label>
+                      <input id="password" type="password" class="form-control pwstrength" data-indicator="pwindicator"
+                        name="password1" placeholder="Password">
+                      <div id="pwindicator" class="pwindicator">
+                        <div class="bar"></div>
+                        <div class="label"></div>
+                      </div>
+                    </div>
+                    <div class="form-group col-6">
+                      <label for="password2" class="d-block"><strong>Password Confirmation</strong></label>
+                      <input id="password2" type="password" class="form-control" name="password2" placeholder="Confirm Your password">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" name="agree" class="custom-control-input" id="agree">
+                      <label class="custom-control-label" for="agree">I agree with the terms and conditions</label>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">
+                        Submit & Register
+                    </button>
+                  </div>
+                </form>
+              </div>
+              <div class="mb-4 text-muted text-center">
+                Already Registered? <a href="{% url 'userauths:sign-in' %}">Login</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!-- General JS Scripts -->
+  <script src="{% static 'js/app.min.js' %}"></script>
+  <!-- JS Libraies -->
+  <script src="{% static 'bundles/jquery-pwstrength/jquery.pwstrength.min.js' %}"></script>
+  <script src="{% static 'bundles/jquery-selectric/jquery.selectric.min.js' %}"></script>
+  <!-- Page Specific JS File -->
+  <script src="{% static 'js/page/auth-register.js' %}"></script>
+  <!-- Template JS File -->
+  <script src="{% static 'js/scripts.js' %}"></script>
+  <!-- Custom JS File -->
+  <script src="{% static 'js/custom.js' %}"></script>
+</body>
+
+
+<!-- auth-register.html  21 Nov 2019 04:05:02 GMT -->
+</html>
+
+
+
+
+
+

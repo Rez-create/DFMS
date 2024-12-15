@@ -1,0 +1,102 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="main-content">
+    <section class="section">
+      <div class="section-body">
+        <div class="row">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+                <h4>Milk Sale</h4>
+              </div>
+              <div class="card-body">
+                <form method="POST" action=".">
+                  {% csrf_token %}
+                  <div class="form-group row mb-4">
+                    <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Date of Purchase</label>
+                    <div class="col-sm-12 col-md-7">
+                      <input type="date" name="current_date" class="form-control">
+                    </div>
+                  </div>
+                  <div class="form-group row mb-4">
+                    <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Clients Name</label>
+                    <div class="col-sm-12 col-md-7">
+                      <input type="text" name="client_name" class="form-control">
+                    </div>
+                  </div>
+                  <div class="form-group row mb-4">
+                    <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Phone Number</label>
+                    <div class="col-sm-12 col-md-7">
+                      <input type="text" name="client_contact" class="form-control">
+                    </div>
+                  </div>
+                  <div class="form-group row mb-4">
+                    <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Unit Price</label>
+                    <div class="col-sm-12 col-md-7">
+                      <input type="number" name="unit_price" class="form-control">
+                    </div>
+                  </div>
+                  <div class="form-group row mb-4">
+                    <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Amount Bought (litres)</label>
+                    <div class="col-sm-12 col-md-7">
+                      <input type="text" name="amount_bought" class="form-control">
+                    </div>
+                  </div>
+                  <div class="card-footer text-center">
+                    <button type="submit" class="btn btn-primary" style="background-color: green;">Save</button>
+                  </div>
+                </form>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <div class="card">
+              
+              <div class="card-body">
+                <div class="card-header">
+                    <h4>Show Records</h4>
+                </div>
+                <table border="2">
+                    <div class="form-group row mb-4">
+                        <tr>
+                          <th>Sale ID</th>
+                          <th>Date of Purchase</th>
+                          <th>Client Name</th>
+                          <th>Phone Number</th>
+                          <th>Quantity Bought (litres)</th>
+                          <th>Price per Litre</th>
+                          <th>Total Price</th>
+                          <th>Delete</th>
+                        </tr>
+                    </div>
+                    <div class="form-group row mb-4">
+                      {% for sale in milk_sales %}
+                        <tr>
+                          <td>{{ sale.sale_id }}</td>
+                          <td>{{ sale.current_date }}</td>
+                          <td>{{ sale.client_name }}</td>
+                          <td>{{ sale.client_contact }}</td>
+                          <td>{{ sale.amount_bought }}</td>
+                          <td>{{ sale.unit_price }}</td>
+                          <td>{{ sale.total_milk_price }}</td>
+                          <td><a class="btn btn-danger btn-xs" href="{% url 'core:milk-sale-delete' sale.sale_id %}"><span class="glyphicon glyphicon-trash"></span></a><br><br>
+                        </tr>
+                      {% endfor %}
+                    </div>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>  
+    </section>
+</div>
+
+{% endblock content %}
+ 

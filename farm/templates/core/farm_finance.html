@@ -1,0 +1,79 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+<div class="main-content">
+  <section class="section">
+    <div class="section-body">
+      <div class="row">
+        <div class="col-12 col-md-6 col-lg-6">
+          <div class="card">
+            <div class="card-header">
+              <h4>Farm Finance</h4>
+            </div>
+            <div class="card-body">
+              <form method="POST" action=".">
+                {% csrf_token %}
+                <div class="form-group">
+                  <label>Date Incurred</label>
+                  <input type="date" name="date_incurred" class="form-control">
+                </div>
+                <div class="form-group">
+                  <label>Type of Expense</label>
+                  <select name="expense_types" class="form-control phone-number" style="height: 40px;">
+                    <option value="">---select type---</option>
+                    {% for code, name in expense_types %} 
+                    <option value="{{ code }}">{{ name }}</option> 
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Amount Incurred</label>
+                  <input type="text" name="amount_incurred" class="form-control pwstrength" data-indicator="pwindicator">
+                </div>
+                <div class="card-footer text-right">
+                  <button type="submit" class="btn btn-primary" style="background-color: green;">Save</button>
+                </div>
+              </form>
+              
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-6">
+          <div class="card">
+            <div class="card-header">
+              <h4>Farm Finance records</h4>
+            </div>
+            <div class="card-body">
+              <table border="3">
+                <div class="form-group">
+                  <tr>
+                    <th>Date Incurred</th>
+                    <th>Type of Expense</th>
+                    <th>Amount Incurred</th>
+                    <th>Delete</th>
+                  </tr>
+                </div>
+                <div class="form-group">
+                  {% for expense in farm_finances %}
+                  <tr>
+                    <td>{{ expense.date_incurred }}</td>
+                    <td>{{ expense.expense_type }}</td>
+                    <td>{{ expense.amount_incurred }}</td>
+                    <td><a class="btn btn-danger btn-xs" href="{% url 'core:finance-records-delete' expense.finance_id %}"><span class="glyphicon glyphicon-trash"></span></a><br><br>
+                  </tr>
+                  {% endfor %}
+                </div>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+
+{% endblock content %}

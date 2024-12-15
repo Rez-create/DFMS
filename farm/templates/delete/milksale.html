@@ -1,0 +1,79 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    .container {
+        font-family: Arial, sans-serif;
+        width: 50%;
+        margin: 0 auto;
+        text-align: center;
+        padding: 20px;
+        background-color: #f0f0f0;
+        border-radius: 10px;
+    }
+    h2 {
+        text-align: center;
+    }
+    p {
+        margin-bottom: 10px;
+    }
+    form {
+        text-align: center;
+    }
+    button {
+        margin-right: 10px;
+        padding: 10px 20px;
+        background-color: red;
+        color: white;
+        border: none;
+    }
+    .cancel a {
+        padding: 10px 20px;
+        background-color: green;
+        color: white;
+        text-decoration: none;
+        border: none;
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+    form button:first-child {
+        background-color: red;
+    }
+    form button:last-child {
+        background-color: green;
+    }
+    form button:hover {
+        cursor: pointer;
+    }
+    form button:focus {
+        outline: none;
+    }
+    form button:active {
+        background-color: gray;
+    }
+    form button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+</style>
+<body>
+    <br><br><br><br><br><br><br><br>
+    <div class="container">
+        <h3><strong>Are you sure you want to delete this record?</strong></h3><br>
+        <label style="color: darkblue; font-size: 20px;">Date of Purchase</label>
+        <p style="font-size: 15px;">{{ milk_sale.current_date }}</p><br>
+        <label style="color: darkblue; font-size: 20px;">Amount Bought (litres)</label>
+        <p style="font-size: 15px;">{{ milk_sale.amount_bought }}</p>
+        <form method="POST">
+            {% csrf_token %}
+            <button class="cancel" type="submit">Yes, Delete</button>
+            <button class="cancel"><a href="{% url 'core:milk-sale' %}">Cancel</a></button>
+        </form><br>
+        <p style="color: grey;">This action cannot be undone.</p>
+    </div>
+
+</body>
+</html>
+{% endblock content %}

@@ -1,0 +1,109 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+
+
+{% block content %}
+
+<div class="main-content">
+    <section class="section">
+      <div class="section-body">
+        <div class="row">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+                <h4>Animal Records</h4>
+              </div>
+              <div class="card-body">
+                <form method="POST" action=".">
+                  {% csrf_token %}
+                  
+                  <div class="form-group">
+                    <label>Cow Name</label>
+                    <input type="text" name="cow_name" class="form-control phone-number" >
+                  </div>
+                  <div class="form-group">
+                    <label>Ear Tag</label>
+                    <input type="text" name="ear_tag" class="form-control pwstrength" data-indicator="pwindicator">
+                  </div>
+                  <div class="form-group">
+                    <label for="animalType">Animal Type</label> 
+                    <select id="animalType" name="animal_types" class="form-control" style="height: 40px;"> 
+                      <option value="" selcted>-----select-----</option>
+                      {% for code, name in animal_types %} 
+                      <option value="{{ code }}">{{ name }}</option> 
+                      {% endfor %} 
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Breed</label>
+                    <input type="text" name="breed" class="form-control invoice-input">
+                  </div>
+                  <div class="form-group">
+                    <label>Color</label>
+                    <input type="text" name="color" class="form-control datemask" placeholder="">
+                  </div>
+                  <div class="form-group">
+                    <label>Birth Date</label>
+                    <input type="date" name="birth_date" class="form-control inputtags">
+                  </div>
+                  <div class="card-footer text-center">
+                    <button type="submit" class="btn btn-primary" style="background-color: green;">Save</button>
+                    <button class="btn btn-primary" style="background-color: blue;">Update</button>
+                  </div>
+                </form>
+                
+              </div>
+            </div>
+              
+            </div>
+          </div>   
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+                  <h5>Records of all Animals in the Farm</h5>
+              </div>
+              
+              <div class="card-body">
+                  
+                <table border="3">
+                  <div class="form-group">
+                    <tr>
+                      <th>Ear Tag</th>
+                      <th>Cow Name</th>
+                      <th>Animal Type</th>
+                      <th>Breed</th>
+                      <th>Birth Date</th>
+                      <th>Age (years)</th>
+                      <th>Delete</th>
+                    </tr>
+                  </div>
+                  <div class="form-group">
+                    {% for animal in animals %}
+                    <tr>
+                      <td>{{ animal.ear_tag }}</td>
+                      <td>{{ animal.cow_name }}</td>
+                      <td>{{ animal.animal_type }}</td>
+                      <td>{{ animal.breed }}</td>
+                      <td>{{ animal.birth_date }}</td>
+                      <td>{{ animal.age }}</td>
+                      <td><a class="btn btn-danger btn-xs" href="{% url 'core:animal-records-delete' animal.ear_tag %}"><span class="glyphicon glyphicon-trash"></span></a><br><br>
+                    </tr>
+                    {% endfor %}
+                  </div>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+</div>
+
+{% endblock content %}
+
+
+        
+    

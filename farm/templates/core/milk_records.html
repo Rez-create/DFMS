@@ -1,0 +1,92 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="main-content">
+    <section class="section">
+      <div class="section-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                  <div class="card-header">
+                    <h4>Milk Records</h4>
+                  </div>
+                  <div class="card-body">
+                    <form method="POST">
+                      {% csrf_token %}
+                      <div class="form-group">
+                        <label>Milking Date</label>
+                        <input type="date" name="milking_date" class="form-control form-control-lg" value="{{ milk_record.milking_date|date:'Y-m-d'|default:'' }}" required>
+                      </div>
+                      <div class="form-group">
+                        <label>Cow Name</label>
+                        <input type="text" name="cow_name" class="form-control" value="{{ milk_record.cow_name|default:'' }}" required>
+                      </div>
+                      <div class="form-group">
+                        <label>Morning Milk Quantity</label>
+                        <input type="text" name="morning_milk_quantity" class="form-control form-control-lg" value="{{ milk_record.morning_milk_quantity|default:'' }}">
+                      </div>
+                      <div class="form-group">
+                        <label>Afternoon Milk Quantity</label>
+                        <input type="text" name="afternoon_milk_quantity" class="form-control form-control-lg" value="{{ milk_record.afternoon_milk_quantity|default:'' }}">
+                      </div>
+                      <div class="form-group">
+                        <label>Evening Milk Quantity</label>
+                        <input type="text" name="evening_milk_quantity" class="form-control form-control-lg" value="{{ milk_record.evening_milk_quantity|default:'' }}">
+                      </div>
+                      <div class="card-footer text-center">
+                        <button type="submit" class="btn btn-primary" style="background-color: green;">Save</button>
+                        <button type="submit" class="btn btn-primary" style="background-color: blue;">Update</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div> 
+              <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="card-header">
+                              <h4>Saved Milk Records</h4>
+                            </div>
+                            <table border="2">
+                            <div class="form-group">
+                            <tr>
+                                <th>Record</th>
+                                <th>Cow Name</th>
+                                <th>Milking Date</th>
+                                <th>Morning Milk Quantity (litres)</th>
+                                <th>Afternoon Milk Quantity (litres)</th>
+                                <th>Evening Milk Quantity (litres)</th>
+                                <th>Total Milk Quantity (litres)</th>
+                                <th>Delete</th>
+                            </tr>
+                            </div>
+                            <div class="form-group">
+                              {% for record in milk_records %}
+                              <tr>
+                                  <td><a href="{% url 'core:milk-records-edit' record.record_id %}">{{ record.record_id }} </a></td> 
+                                  <td>{{ record.cow_name }}</td>
+                                  <td>{{ record.milking_date }}</td>
+                                  <td>{{ record.morning_milk_quantity }}</td>
+                                  <td>{{ record.afternoon_milk_quantity }}</td>
+                                  <td>{{ record.evening_milk_quantity }}</td>
+                                  <td>{{ record.total_milk_quantity }}</td>
+                                  <td><a class="btn btn-danger btn-xs" href="{% url 'core:milk-records-delete' record.record_id %}"><span class="glyphicon glyphicon-trash"></span></a><br><br>
+                              </tr> 
+                              {% endfor %}
+                            </div>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+              </div>
+        </div>
+      </div>
+      
+  
+
+          
+
+{% endblock content %}

@@ -4,12 +4,137 @@ from django.http import HttpResponseBadRequest
 from decimal import Decimal
 from django.shortcuts import render, redirect
 from django.utils import timezone
+from django.db.models import Sum, Count, Avg
+from django.db.models.functions import TruncMonth
+from datetime import timedelta
+import json
 from core.models import MilkRecord, MilkSale, StockFeed, Animal, Breeding, FarmFinance, Employee
 
 
 def index(request):
-    
-    return render(request, 'core/index.html')
+    today = timezone.now().date()
+    thirty_days_ago = today - timedelta(days=30)
+    seven_days_ago = today - timedelta(days=7)
+
+    # -- Key metrics --
+    total_animals = Animal.objects.count()
+    total_cows = Animal.objects.filter(animal_type='Cow').count()
+    total_calves = Animal.objects.filter(animal_type='Calf').count()
+    total_employees = Employee.objects.count()
+
+    # Milk production
+    milk_records_30d = MilkRecord.objects.filter(milking_date__gte=thirty_days_ago)
+    total_milk_30d = 0
+    for r in milk_records_30d:
+        total_milk_30d += (r.morning_milk_quantity or 0) + (r.afternoon_milk_quantity or 0) + (r.evening_milk_quantity or 0)
+
+    milk_records_7d = MilkRecord.objects.filter(milking_date__gte=seven_days_ago)
+    total_milk_7d = 0
+    for r in milk_records_7d:
+        total_milk_7d += (r.morning_milk_quantity or 0) + (r.afternoon_milk_quantity or 0) + (r.evening_milk_quantity or 0)
+
+    # Revenue
+    sales_30d = MilkSale.objects.filter(current_date__gte=thirty_days_ago)
+    revenue_30d = Decimal('0.00')
+    for sale in sales_30d:
+        revenue_30d += sale.unit_price * Decimal(str(sale.amount_bought))
+
+    sales_7d = MilkSale.objects.filter(current_date__gte=seven_days_ago)
+    revenue_7d = Decimal('0.00')
+    for sale in sales_7d:
+        revenue_7d += sale.unit_price * Decimal(str(sale.amount_bought))
+
+    # Expenses
+    expenses_30d = FarmFinance.objects.filter(date_incurred__gte=thirty_days_ago).aggregate(
+        total=Sum('amount_incurred')
+    )['total'] or Decimal('0.00')
+
+    # Expense breakdown by type (for pie chart)
+    expense_breakdown = list(
+        FarmFinance.objects.filter(date_incurred__gte=thirty_days_ago)
+        .values('expense_type')
+        .annotate(total=Sum('amount_incurred'))
+        .order_by('-total')
+    )
+    expense_labels = json.dumps([e['expense_type'] for e in expense_breakdown])
+    expense_values = json.dumps([float(e['total']) for e in expense_breakdown])
+
+    # Monthly milk production (last 6 months for chart)
+    six_months_ago = today - timedelta(days=180)
+    monthly_milk_raw = (
+        MilkRecord.objects.filter(milking_date__gte=six_months_ago)
+        .annotate(month=TruncMonth('milking_date'))
+        .values('month')
+        .annotate(
+            morning=Sum('morning_milk_quantity'),
+            afternoon=Sum('afternoon_milk_quantity'),
+            evening=Sum('evening_milk_quantity'),
+        )
+        .order_by('month')
+    )
+    milk_chart_labels = []
+    milk_chart_data = []
+    for entry in monthly_milk_raw:
+        milk_chart_labels.append(entry['month'].strftime('%b %Y'))
+        total = (entry['morning'] or 0) + (entry['afternoon'] or 0) + (entry['evening'] or 0)
+        milk_chart_data.append(round(float(total), 1))
+    milk_chart_labels = json.dumps(milk_chart_labels)
+    milk_chart_data = json.dumps(milk_chart_data)
+
+    # Monthly revenue (last 6 months for chart)
+    monthly_revenue_raw = (
+        MilkSale.objects.filter(current_date__gte=six_months_ago)
+        .annotate(month=TruncMonth('current_date'))
+        .values('month')
+        .order_by('month')
+    )
+    revenue_chart_labels = []
+    revenue_chart_data = []
+    monthly_rev_agg = {}
+    for sale in MilkSale.objects.filter(current_date__gte=six_months_ago):
+        month_key = sale.current_date.replace(day=1)
+        rev = sale.unit_price * Decimal(str(sale.amount_bought))
+        monthly_rev_agg[month_key] = monthly_rev_agg.get(month_key, Decimal('0')) + rev
+    for month_key in sorted(monthly_rev_agg.keys()):
+        revenue_chart_labels.append(month_key.strftime('%b %Y'))
+        revenue_chart_data.append(float(monthly_rev_agg[month_key]))
+    revenue_chart_labels = json.dumps(revenue_chart_labels)
+    revenue_chart_data = json.dumps(revenue_chart_data)
+
+    # Upcoming calving
+    upcoming_calving = Breeding.objects.filter(
+        date_due_to_calve__gte=today,
+        date_calved__isnull=True
+    ).order_by('date_due_to_calve')[:5]
+
+    # Recent sales
+    recent_sales = MilkSale.objects.all().order_by('-current_date')[:5]
+
+    # Recent expenses
+    recent_expenses = FarmFinance.objects.all().order_by('-date_incurred')[:5]
+
+    context = {
+        'total_animals': total_animals,
+        'total_cows': total_cows,
+        'total_calves': total_calves,
+        'total_employees': total_employees,
+        'total_milk_30d': round(total_milk_30d, 1),
+        'total_milk_7d': round(total_milk_7d, 1),
+        'revenue_30d': revenue_30d,
+        'revenue_7d': revenue_7d,
+        'expenses_30d': expenses_30d,
+        'profit_30d': revenue_30d - expenses_30d,
+        'expense_labels': expense_labels,
+        'expense_values': expense_values,
+        'milk_chart_labels': milk_chart_labels,
+        'milk_chart_data': milk_chart_data,
+        'revenue_chart_labels': revenue_chart_labels,
+        'revenue_chart_data': revenue_chart_data,
+        'upcoming_calving': upcoming_calving,
+        'recent_sales': recent_sales,
+        'recent_expenses': recent_expenses,
+    }
+    return render(request, 'core/index.html', context)
 
 
 # #######################################################################################

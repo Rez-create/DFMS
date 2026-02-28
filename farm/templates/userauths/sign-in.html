@@ -6,7 +6,7 @@
 <head>
   <meta charset="UTF-8">
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-  <title>Sang's Dairy Farm Management System</title>
+  <title>Dairy Farm Management System</title>
   <!-- General CSS Files -->
   <link rel="stylesheet" href="{% static 'css/app.min.css' %}">
   <link rel="stylesheet" href="{% static 'bundles/bootstrap-social/bootstrap-social.css' %}">
@@ -15,15 +15,15 @@
   <link rel="stylesheet" href="{% static 'css/components.css' %}">
   <!-- Custom style CSS -->
   <link rel="stylesheet" href="{% static 'css/custom.css' %}">
-  <link rel='shortcut icon' type='image/x-icon' href='img/favicon.ico' />
+  <link rel='shortcut icon' type='image/x-icon' href="{% static 'img/favicon.ico' %}" />
 </head>
 
 <body>
   <div class="loader"></div>
   <div id="app">
-    <section class="section">
+    <section class="section auth-page-wrapper">
       <div class="container mt-5">
-        <h2 style="text-align: center;">Welcome back to Sang's Dairy Farm Management System</h2><br>
+        <h2 style="text-align: center;">Welcome back</h2><br>
         <div class="row">
           <div class="col-12 col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-6 offset-lg-3 col-xl-4 offset-xl-4">
             
@@ -34,11 +34,10 @@
               </div>
               <div class="card-body">
                 {% if form.errors or form.non_field_errors %}
-                    <div class="mb-3 p-6 bg-red-100 rounded-xl">
+                    <div class="auth-error-box">
                         {% for field in form %}
                             {{ field.errors }}
                         {% endfor %}
-
                         {{ form.non_field_errors }}
                     </div>
                 {% endif %}

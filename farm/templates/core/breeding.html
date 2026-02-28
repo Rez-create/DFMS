@@ -1,132 +1,174 @@
 {% extends "partials/base.html" %}
 {% load static %}
 
-{% block content %}
+{% block title %}Breeding Records{% endblock %}
 
+{% block content %}
 <div class="main-content">
-    <section class="section">
-      <div class="section-body">
-        <div class="row">
-          <div class="col-12">
-            <div class="card">
-              <div class="card-header">
-                <h4>Breeding Details</h4>
-              </div>
-              <div class="card-body">
-                <form method="POST" action=".">
-                  {% csrf_token %}
-                  <div class="form-group row mb-4">
-                    <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Heat Date</label>
-                    <div class="col-sm-12 col-md-7">
+  <section class="section">
+    <div class="section-header">
+      <h1>Breeding Records</h1>
+      <div class="section-header-breadcrumb">
+        <div class="breadcrumb-item"><a href="{% url 'core:index' %}">Dashboard</a></div>
+        <div class="breadcrumb-item active">Breeding</div>
+      </div>
+    </div>
+
+    <div class="section-body">
+      <div class="row">
+        <!-- Form -->
+        <div class="col-12 col-lg-5">
+          <div class="card">
+            <div class="card-header">
+              <h4>{% if breeding %}Edit Record{% else %}Add Breeding Record{% endif %}</h4>
+            </div>
+            <div class="card-body">
+              <form method="POST">
+                {% csrf_token %}
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Heat Date</label>
                       <input type="date" name="heat_date" class="form-control" value="{{ breeding.heat_date|date:'Y-m-d'|default:'' }}">
                     </div>
                   </div>
-                  <div class="form-group row mb-4">
-                    <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Breeding Date</label>
-                    <div class="col-sm-12 col-md-7">
-                      <input type="date" name="breeding_date" class="form-control" value="{{ breeding.breeding_date|date:'Y-m-d'|default:'' }}">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Breeding Date</label>
+                      <input type="date" name="breeding_date" class="form-control" value="{{ breeding.breeding_date|date:'Y-m-d'|default:'' }}" required>
                     </div>
                   </div>
-                  <div class="form-group row mb-4">
-                    <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Bull Name</label>
-                    <div class="col-sm-12 col-md-7">
-                      <input type="text" name="bull_name" class="form-control" value="{{ breeding.bull_name|default:'' }}">
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Cow Name</label>
+                      <input type="text" name="cow_name" class="form-control" value="{{ breeding.cow_name|default:'' }}" placeholder="e.g. Daisy" required>
                     </div>
                   </div>
-                  <div class="form-group row mb-4">
-                    <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Cow Name</label>
-                    <div class="col-sm-12 col-md-7">
-                      <input type="text" name="cow_name" class="form-control" value="{{ breeding.cow_name|default:'' }}">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Bull Name</label>
+                      <input type="text" name="bull_name" class="form-control" value="{{ breeding.bull_name|default:'' }}" placeholder="e.g. Zeus" required>
                     </div>
                   </div>
-                  <div class="form-group row mb-4">
-                    <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Pregnancy Diagnosis Date</label>
-                    <div class="col-sm-12 col-md-7">
-                      <input type="date" name="pregnancy_diagnosis_date" class="form-control" value="{{ breeding.pregnancy_diagnosis_date|date:'Y-m-d'|default:'' }}">
-                    </div>
-                  </div>
-                  <div class="form-group row mb-4">
-                    <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Date due to Calve</label>
-                    <div class="col-sm-12 col-md-7">
+                </div>
+                <div class="form-group">
+                  <label>Pregnancy Diagnosis Date</label>
+                  <input type="date" name="pregnancy_diagnosis_date" class="form-control" value="{{ breeding.pregnancy_diagnosis_date|date:'Y-m-d'|default:'' }}">
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Date Due to Calve</label>
                       <input type="date" name="date_due_to_calve" class="form-control" value="{{ breeding.date_due_to_calve|date:'Y-m-d'|default:'' }}">
                     </div>
                   </div>
-                  <div class="form-group row mb-4">
-                    <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Date Calved</label>
-                    <div class="col-sm-12 col-md-7">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Date Calved</label>
                       <input type="date" name="date_calved" class="form-control" value="{{ breeding.date_calved|date:'Y-m-d'|default:'' }}">
                     </div>
                   </div>
-                  <div class="form-group row mb-4">
-                    <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Age of Cow at Calving</label>
-                    <div class="col-sm-12 col-md-7">
-                      <input type="text"name="age_of_cow_at_calving" class="form-control" value="{{ breeding.age_of_cow_at_calving|default:'' }}">
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Cow Age at Calving</label>
+                      <input type="number" name="age_of_cow_at_calving" class="form-control" value="{{ breeding.age_of_cow_at_calving|default:'' }}" placeholder="Years">
                     </div>
                   </div>
-                  <div class="form-group row mb-4">
-                    <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Calf Name</label>
-                    <div class="col-sm-12 col-md-7">
-                      <input type="text" name="calf_name" class="form-control" value="{{ breeding.calf_name|default:'' }}">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Calf Name</label>
+                      <input type="text" name="calf_name" class="form-control" value="{{ breeding.calf_name|default:'' }}" placeholder="Name of calf">
                     </div>
                   </div>
-                  <div class="form-group row mb-4">
-                    <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Calving Notes</label>
-                    <div class="col-sm-12 col-md-7">
-                      <input type="text" name="calving_notes" class="form-control" value="{{ breeding.calving_notes|default:'' }}">
-                    </div>
-                  </div>
-                  <div class="card-footer text-center">
-                    <button type="submit" class="btn btn-primary" style="background-color: green;">Save</button>
-                    <button type="submit" class="btn btn-primary" style="background-color: blue;">Update</button>
-                  </div>
-                </form>
-              </div>
+                </div>
+                <div class="form-group">
+                  <label>Calving Notes</label>
+                  <textarea name="calving_notes" class="form-control" rows="2" placeholder="Additional notes...">{{ breeding.calving_notes|default:'' }}</textarea>
+                </div>
+                <div class="card-footer text-right">
+                  {% if breeding %}
+                    <button type="submit" class="btn btn-update">Update</button>
+                    <a href="{% url 'core:breeding' %}" class="btn btn-cancel">Cancel</a>
+                  {% else %}
+                    <button type="submit" class="btn btn-save">Save</button>
+                  {% endif %}
+                </div>
+              </form>
             </div>
           </div>
         </div>
-        <div class="row">
-          <div class="col-12">
-            <div class="card">
-              <div class="card-header">
-                <h4>Show Records</h4>
-              </div>
-              <div class="card-body">
-                <table border="2">
-                  <div class="form-group row mb-4">
-                  <tr>
-                    <th>Record ID</th>
-                    <th>Cow Name</th>
-                    <th>Heat Date</th>
-                    <th>Breeding Date</th>
-                    <th>Pregnancy Diagnosis Date</th>
-                    <th>Date due to Calve</th>
-                    <th>Date Calved</th>
-                    <th>Calf Name</th>
-                    <th>Delete</th>
-                  </tr>
-                  </div>
-                  <div class="form-group row mb-4">
-                    {% for record in breedings %}
-                    <tr>
-                      <td><a href="{% url 'core:breeding-records-edit' record.breeding_id %}">{{ record.breeding_id }}</a></td>  
-                      <td>{{ record.cow_name }}</td>
-                      <td>{{ record.heat_date }}</td>
-                      <td>{{ record.breeding_date }}</td>
-                      <td>{{ record.pregnancy_diagnosis_date }}</td>
-                      <td>{{ record.date_due_to_calve }}</td>
-                      <td>{{ record.date_calved }}</td>
-                      <td>{{ record.calf_name }}</td>
-                      <td><a class="btn btn-danger btn-xs" href="{% url 'core:breeding-records-delete' record.breeding_id %}"><span class="glyphicon glyphicon-trash"></span></a></td><br><br>
-                    </tr>
-                    {% endfor %}
-                  </div>
-                </table>  
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>  
-    </section>
-  </div>
 
+        <!-- Table -->
+        <div class="col-12 col-lg-7">
+          <div class="card">
+            <div class="card-header">
+              <h4>All Breeding Records</h4>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-striped" id="breedingTable">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Cow</th>
+                      <th>Bull</th>
+                      <th>Heat Date</th>
+                      <th>Breeding Date</th>
+                      <th>Due Date</th>
+                      <th>Calved</th>
+                      <th>Calf</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for b in breedings %}
+                    <tr>
+                      <td>{{ b.breeding_id }}</td>
+                      <td><strong>{{ b.cow_name }}</strong></td>
+                      <td>{{ b.bull_name }}</td>
+                      <td>{{ b.heat_date|date:"M d, Y"|default:"—" }}</td>
+                      <td>{{ b.breeding_date|date:"M d, Y" }}</td>
+                      <td>{{ b.date_due_to_calve|date:"M d, Y"|default:"—" }}</td>
+                      <td>
+                        {% if b.date_calved %}
+                          <span class="badge badge-success">{{ b.date_calved|date:"M d, Y" }}</span>
+                        {% else %}
+                          <span class="badge badge-warning">Pending</span>
+                        {% endif %}
+                      </td>
+                      <td>{{ b.calf_name|default:"—" }}</td>
+                      <td class="text-nowrap">
+                        <a href="{% url 'core:breeding-records-edit' b.breeding_id %}" class="btn btn-action btn-edit" title="Edit"><i class="fas fa-edit"></i></a>
+                        <a href="{% url 'core:breeding-records-delete' b.breeding_id %}" class="btn btn-action btn-del" title="Delete"><i class="fas fa-trash"></i></a>
+                      </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="9" class="text-center text-muted">No breeding records</td></tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
 {% endblock content %}
+
+{% block extra_js %}
+<script>
+  $(document).ready(function() {
+    $('#breedingTable').DataTable({
+      "order": [[3, "desc"]],
+      "pageLength": 10,
+      "language": { "emptyTable": "No breeding records found" }
+    });
+  });
+</script>
+{% endblock %}

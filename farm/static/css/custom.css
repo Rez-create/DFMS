@@ -1,4 +1,542 @@
+/* ================================================================
+   Sang's Dairy Farm Management System — Custom Styles
+   Production-Ready Design System
+   ================================================================ */
 
-/*# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiY3VzdG9tLmNzcyIsInNvdXJjZXMiOlsiY3VzdG9tLnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiJ9 */
+/* ---- Global Overrides ---- */
+body {
+  background: #f4f6f9;
+}
 
-/*# sourceMappingURL=custom.css.map */
+.section-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #34395e;
+}
+
+/* Ensure .section inside .main-content has proper top spacing
+   so content doesn't hide behind the fixed navbar (70px). 
+   Stisla sets padding-top:107px on .main-content — do NOT override it. */
+.main-content > .section {
+  padding-top: 10px;
+}
+
+/* ---- KPI Statistic Cards ---- */
+.card-statistic-1 {
+  border: none;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card-statistic-1:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.card-statistic-1 .card-icon {
+  width: 60px;
+  height: 60px;
+  line-height: 60px;
+  font-size: 22px;
+  border-radius: 6px;
+}
+
+.card-statistic-1 .card-wrap .card-header h4 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #98a6ad;
+  margin-bottom: 2px;
+}
+
+.card-statistic-1 .card-wrap .card-body {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #34395e;
+  padding-top: 0;
+}
+
+/* ---- Cards ---- */
+.card {
+  border: none;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  margin-bottom: 24px;
+}
+
+.card .card-header {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 18px 24px;
+  background: transparent;
+}
+
+.card .card-header h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #34395e;
+  margin: 0;
+}
+
+.card .card-body {
+  padding: 20px 24px;
+}
+
+/* ---- Data Tables (DataTables integration) ---- */
+.dataTable {
+  width: 100% !important;
+  border-collapse: collapse;
+}
+
+.dataTable thead th {
+  background-color: #6777ef;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px 16px;
+  border: none !important;
+  white-space: nowrap;
+}
+
+.dataTable tbody td {
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  color: #34395e;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+
+.dataTable tbody tr:hover {
+  background-color: #f8f9fe !important;
+}
+
+.dataTable tbody tr.odd {
+  background-color: #fff;
+}
+
+.dataTable tbody tr.even {
+  background-color: #fcfcfd;
+}
+
+/* DataTables controls styling */
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+  padding: 12px 16px;
+  font-size: 0.85rem;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 5px 12px;
+  margin-left: 8px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background: #6777ef !important;
+  color: #fff !important;
+  border-color: #6777ef !important;
+  border-radius: 4px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: #eef0ff !important;
+  color: #6777ef !important;
+  border-color: #eef0ff !important;
+}
+
+/* ---- Action Buttons ---- */
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  padding: 0;
+  font-size: 14px;
+  transition: all 0.15s ease;
+}
+
+.btn-action:hover {
+  transform: scale(1.1);
+}
+
+.btn-edit {
+  background-color: #3abaf4;
+  border-color: #3abaf4;
+  color: #fff;
+}
+
+.btn-edit:hover {
+  background-color: #2da4d8;
+  color: #fff;
+}
+
+.btn-del {
+  background-color: #fc544b;
+  border-color: #fc544b;
+  color: #fff;
+}
+
+.btn-del:hover {
+  background-color: #e0392f;
+  color: #fff;
+}
+
+/* ---- Form Styling ---- */
+.form-group label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #34395e;
+  margin-bottom: 6px;
+}
+
+.form-control {
+  border-radius: 4px;
+  border: 1px solid #dce0e6;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus {
+  border-color: #6777ef;
+  box-shadow: 0 0 0 3px rgba(103, 119, 239, 0.15);
+}
+
+select.form-control {
+  height: 42px !important;
+  appearance: auto;
+}
+
+.card-footer {
+  background: transparent;
+  border-top: 1px solid #f0f0f0;
+  padding: 15px 24px;
+}
+
+/* Form Buttons */
+.btn-save {
+  background-color: #47c363;
+  border-color: #47c363;
+  color: #fff;
+  font-weight: 600;
+  padding: 8px 28px;
+  border-radius: 4px;
+}
+
+.btn-save:hover {
+  background-color: #3dae56;
+  border-color: #3dae56;
+  color: #fff;
+}
+
+.btn-update {
+  background-color: #6777ef;
+  border-color: #6777ef;
+  color: #fff;
+  font-weight: 600;
+  padding: 8px 28px;
+  border-radius: 4px;
+}
+
+.btn-update:hover {
+  background-color: #394eea;
+  border-color: #394eea;
+  color: #fff;
+}
+
+.btn-cancel {
+  background-color: #cdd3d8;
+  border-color: #cdd3d8;
+  color: #34395e;
+  font-weight: 600;
+  padding: 8px 28px;
+  border-radius: 4px;
+}
+
+.btn-cancel:hover {
+  background-color: #b8bfc6;
+  border-color: #b8bfc6;
+  color: #34395e;
+}
+
+/* ---- Delete Confirmation ---- */
+.delete-confirm-card {
+  max-width: 480px;
+  margin: 60px auto 0;
+  text-align: center;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.delete-confirm-card .card-header {
+  background: linear-gradient(135deg, #fc544b 0%, #e0392f 100%);
+  padding: 28px 24px;
+  border: none;
+}
+
+.delete-confirm-card .card-header i {
+  font-size: 2.5rem;
+  color: rgba(255,255,255,0.9);
+  display: block;
+  margin-bottom: 10px;
+}
+
+.delete-confirm-card .card-header h4 {
+  color: #fff !important;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.delete-confirm-card .card-body {
+  padding: 30px 24px 10px;
+}
+
+.delete-confirm-card .detail-label {
+  color: #6777ef;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+}
+
+.delete-confirm-card .detail-value {
+  font-size: 1.05rem;
+  color: #34395e;
+  font-weight: 500;
+  margin-bottom: 18px;
+}
+
+.delete-confirm-card .card-footer {
+  padding: 20px 24px 28px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.delete-confirm-card .card-footer .btn {
+  min-width: 120px;
+  margin: 0 6px;
+  font-weight: 600;
+}
+
+/* ---- Auth Pages ---- */
+.auth-error-box {
+  background-color: #fff5f5;
+  border: 1px solid #fc544b;
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  color: #e41e1e;
+  font-size: 0.88rem;
+}
+
+.auth-error-box ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+/* ---- Sidebar Enhancements ---- */
+.main-sidebar .sidebar-brand a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.main-sidebar .sidebar-brand .logo-name {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.sidebar-menu li.menu-header {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding: 20px 24px 6px;
+  color: #98a6ad;
+}
+
+.sidebar-menu li a {
+  font-size: 0.9rem;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #78828a;
+  transition: all 0.2s ease;
+}
+
+.sidebar-menu li a:hover {
+  background-color: rgba(103, 119, 239, 0.06);
+  color: #6777ef;
+}
+
+.sidebar-menu li.active > a {
+  background-color: rgba(103, 119, 239, 0.1);
+  color: #6777ef;
+  font-weight: 600;
+  border-left: 3px solid #6777ef;
+}
+
+.sidebar-menu li a i,
+.sidebar-menu li a svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* ---- Footer ---- */
+.main-footer {
+  background: #fff;
+  border-top: 1px solid #f0f0f0;
+  font-size: 0.85rem;
+  color: #98a6ad;
+  /* Ensure footer sits above the sidebar (z-index:880) */
+  position: relative;
+  z-index: 890;
+}
+
+.main-footer strong {
+  color: #6777ef;
+}
+
+/* ---- Dashboard Specific ---- */
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #fcfcfd;
+}
+
+.badge-feed     { background-color: #47c363; color: #fff; }
+.badge-veterinary { background-color: #fc544b; color: #fff; }
+.badge-equipment  { background-color: #ffa426; color: #fff; }
+.badge-labor      { background-color: #3abaf4; color: #fff; }
+.badge-maintenance { background-color: #6777ef; color: #fff; }
+.badge-other      { background-color: #98a6ad; color: #fff; }
+
+/* Animal type badges */
+.badge-cow  { background-color: #6777ef; color: #fff; }
+.badge-calf { background-color: #ffa426; color: #fff; }
+
+/* Expense type badge helper */
+.expense-badge {
+  font-weight: 600;
+  font-size: 0.78rem;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+.expense-feed        { background-color: #47c363; color: #fff; }
+.expense-veterinary  { background-color: #fc544b; color: #fff; }
+.expense-equipment   { background-color: #ffa426; color: #fff; }
+.expense-labor       { background-color: #3abaf4; color: #fff; }
+.expense-maintenance { background-color: #6777ef; color: #fff; }
+.expense-other       { background-color: #98a6ad; color: #fff; }
+
+/* ---- Page Section Header ---- */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 15px;
+}
+
+.section-header-breadcrumb {
+  display: flex;
+  align-items: center;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+  content: "/";
+  padding: 0 8px;
+  color: #ccc;
+}
+
+.breadcrumb-item a {
+  color: #6777ef;
+  font-weight: 500;
+}
+
+.breadcrumb-item:last-child {
+  color: #98a6ad;
+}
+
+/* ---- Auth Pages ---- Additional polish */
+.auth-page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.auth-page-wrapper .card {
+  border-radius: 10px;
+  box-shadow: 0 4px 25px rgba(0,0,0,0.15);
+}
+
+.auth-page-wrapper h2 {
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.auth-page-wrapper .text-muted a {
+  color: #667eea;
+  font-weight: 600;
+}
+
+/* Quick Actions */
+.quick-action-btn {
+  border-radius: 6px;
+  font-weight: 600;
+  padding: 10px 20px;
+  transition: all 0.2s ease;
+}
+
+.quick-action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Empty state helper */
+.text-muted {
+  color: #98a6ad !important;
+}
+
+/* Table text-nowrap for action columns */
+.text-nowrap {
+  white-space: nowrap;
+}
+
+/* Improve sidebar scroll on short viewports */
+#sidebar-wrapper {
+  overflow-y: auto;
+  max-height: 100vh;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .card-statistic-1 .card-wrap .card-body {
+    font-size: 1.1rem;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .table-responsive-custom {
+    margin: 0 -15px;
+  }
+
+  /* On mobile, footer should clear sidebar */
+  .main-footer {
+    z-index: 890;
+  }
+}

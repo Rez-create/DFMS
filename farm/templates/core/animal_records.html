@@ -1,109 +1,130 @@
 {% extends "partials/base.html" %}
 {% load static %}
 
-
+{% block title %}Animal Records{% endblock %}
 
 {% block content %}
-
 <div class="main-content">
-    <section class="section">
-      <div class="section-body">
-        <div class="row">
-          <div class="col-12">
-            <div class="card">
-              <div class="card-header">
-                <h4>Animal Records</h4>
-              </div>
-              <div class="card-body">
-                <form method="POST" action=".">
-                  {% csrf_token %}
-                  
-                  <div class="form-group">
-                    <label>Cow Name</label>
-                    <input type="text" name="cow_name" class="form-control phone-number" >
-                  </div>
-                  <div class="form-group">
-                    <label>Ear Tag</label>
-                    <input type="text" name="ear_tag" class="form-control pwstrength" data-indicator="pwindicator">
-                  </div>
-                  <div class="form-group">
-                    <label for="animalType">Animal Type</label> 
-                    <select id="animalType" name="animal_types" class="form-control" style="height: 40px;"> 
-                      <option value="" selcted>-----select-----</option>
-                      {% for code, name in animal_types %} 
-                      <option value="{{ code }}">{{ name }}</option> 
-                      {% endfor %} 
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label>Breed</label>
-                    <input type="text" name="breed" class="form-control invoice-input">
-                  </div>
-                  <div class="form-group">
-                    <label>Color</label>
-                    <input type="text" name="color" class="form-control datemask" placeholder="">
-                  </div>
-                  <div class="form-group">
-                    <label>Birth Date</label>
-                    <input type="date" name="birth_date" class="form-control inputtags">
-                  </div>
-                  <div class="card-footer text-center">
-                    <button type="submit" class="btn btn-primary" style="background-color: green;">Save</button>
-                    <button class="btn btn-primary" style="background-color: blue;">Update</button>
-                  </div>
-                </form>
-                
-              </div>
+  <section class="section">
+    <div class="section-header">
+      <h1>Animal Records</h1>
+      <div class="section-header-breadcrumb">
+        <div class="breadcrumb-item"><a href="{% url 'core:index' %}">Dashboard</a></div>
+        <div class="breadcrumb-item active">Animal Records</div>
+      </div>
+    </div>
+
+    <div class="section-body">
+      <div class="row">
+        <!-- Form -->
+        <div class="col-12 col-md-5 col-lg-4">
+          <div class="card">
+            <div class="card-header">
+              <h4>Register Animal</h4>
             </div>
-              
+            <div class="card-body">
+              <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                  <label>Name</label>
+                  <input type="text" name="cow_name" class="form-control" placeholder="e.g. Daisy" required>
+                </div>
+                <div class="form-group">
+                  <label>Ear Tag</label>
+                  <input type="text" name="ear_tag" class="form-control" placeholder="Auto-generated if blank">
+                </div>
+                <div class="form-group">
+                  <label>Animal Type</label>
+                  <select name="animal_types" class="form-control" required>
+                    <option value="">-- Select --</option>
+                    {% for value, label in animal_types %}
+                    <option value="{{ value }}">{{ label }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Breed</label>
+                  <input type="text" name="breed" class="form-control" placeholder="e.g. Friesian" required>
+                </div>
+                <div class="form-group">
+                  <label>Color</label>
+                  <input type="text" name="color" class="form-control" placeholder="e.g. Black & White" required>
+                </div>
+                <div class="form-group">
+                  <label>Birth Date</label>
+                  <input type="date" name="birth_date" class="form-control" required>
+                </div>
+                <div class="card-footer text-right">
+                  <button type="submit" class="btn btn-save">Register</button>
+                </div>
+              </form>
             </div>
-          </div>   
+          </div>
         </div>
-        <div class="row">
-          <div class="col-12">
-            <div class="card">
-              <div class="card-header">
-                  <h5>Records of all Animals in the Farm</h5>
-              </div>
-              
-              <div class="card-body">
-                  
-                <table border="3">
-                  <div class="form-group">
+
+        <!-- Table -->
+        <div class="col-12 col-md-7 col-lg-8">
+          <div class="card">
+            <div class="card-header">
+              <h4>All Animals</h4>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-striped" id="animalTable">
+                  <thead>
                     <tr>
                       <th>Ear Tag</th>
-                      <th>Cow Name</th>
-                      <th>Animal Type</th>
+                      <th>Name</th>
+                      <th>Type</th>
                       <th>Breed</th>
+                      <th>Color</th>
                       <th>Birth Date</th>
-                      <th>Age (years)</th>
-                      <th>Delete</th>
+                      <th>Age</th>
+                      <th>Actions</th>
                     </tr>
-                  </div>
-                  <div class="form-group">
+                  </thead>
+                  <tbody>
                     {% for animal in animals %}
                     <tr>
-                      <td>{{ animal.ear_tag }}</td>
-                      <td>{{ animal.cow_name }}</td>
-                      <td>{{ animal.animal_type }}</td>
+                      <td><code>{{ animal.ear_tag }}</code></td>
+                      <td><strong>{{ animal.cow_name }}</strong></td>
+                      <td>
+                        <span class="badge badge-{{ animal.animal_type|lower }}">{{ animal.animal_type }}</span>
+                      </td>
                       <td>{{ animal.breed }}</td>
-                      <td>{{ animal.birth_date }}</td>
-                      <td>{{ animal.age }}</td>
-                      <td><a class="btn btn-danger btn-xs" href="{% url 'core:animal-records-delete' animal.ear_tag %}"><span class="glyphicon glyphicon-trash"></span></a><br><br>
+                      <td>{{ animal.color }}</td>
+                      <td>{{ animal.birth_date|date:"M d, Y" }}</td>
+                      <td>{{ animal.age }} yrs</td>
+                      <td>
+                        <a href="{% url 'core:animal-records-delete' animal.ear_tag %}" class="btn btn-action btn-del" title="Delete"><i class="fas fa-trash"></i></a>
+                      </td>
                     </tr>
+                    {% empty %}
+                    <tr><td colspan="8" class="text-center text-muted">No animals registered</td></tr>
                     {% endfor %}
-                  </div>
+                  </tbody>
                 </table>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 </div>
-
 {% endblock content %}
 
+{% block extra_js %}
+<script>
+  $(document).ready(function() {
+    $('#animalTable').DataTable({
+      "order": [[1, "asc"]],
+      "pageLength": 10,
+      "language": { "emptyTable": "No animals registered" }
+    });
+  });
+</script>
+{% endblock %}
 
-        
-    
+
+

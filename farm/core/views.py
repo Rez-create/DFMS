@@ -1,16 +1,19 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required  # Import for login requirement (optional)
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest
 from decimal import Decimal
 from django.shortcuts import render, redirect
 from django.utils import timezone
-from django.db.models import Sum, Count, Avg
+from django.db.models import Sum, Count, Avg, Q
 from django.db.models.functions import TruncMonth
 from datetime import timedelta
+from django.core.paginator import Paginator
 import json
 from core.models import MilkRecord, MilkSale, StockFeed, Animal, Breeding, FarmFinance, Employee
+from core.forms import AnimalForm, MilkRecordForm, MilkSaleForm, BreedingForm, StockFeedForm, FarmFinanceForm, EmployeeForm
 
 
+@login_required
 def index(request):
     today = timezone.now().date()
     thirty_days_ago = today - timedelta(days=30)
@@ -140,26 +143,50 @@ def index(request):
 # #######################################################################################
 # ......................................................................................
 # ///////////// ANIMAL RECORDS ///////////////////////////////////////////////////////////
-def animal_records(request):
+@login_required
+def animal_records(request, ear_tag=None):
+    # Handle edit
+    animal = None
+    if ear_tag:
+        animal = get_object_or_404(Animal, ear_tag=ear_tag)
+    
     if request.method == 'POST':
-        animal_records = Animal(
-            ear_tag=request.POST['ear_tag'],
-            cow_name=request.POST['cow_name'],
-            animal_type = request.POST.get('animal_types'),
-            breed=request.POST['breed'],
-            color=request.POST['color'],
-            birth_date=request.POST['birth_date']
-        )
-        animal_records.save()
-        return redirect('core:animal-records')  # Redirect to list view after creation
+        form = AnimalForm(request.POST, instance=animal)
+        if form.is_valid():
+            form.save()
+            return redirect('core:animal-records')
     else:
-        # Display a form for creating a new animal
-        animal_types = Animal.animal_types
-        animals = Animal.objects.all()  # Fetch all animal objects
-        context = {'animal_types': animal_types,
-                   'animals': animals
-                   }
-        return render(request, 'core/animal_records.html', context)
+        form = AnimalForm(instance=animal)
+    
+    # Search and filter
+    animals_list = Animal.objects.all().order_by('-birth_date')
+    search_query = request.GET.get('search', '')
+    animal_type_filter = request.GET.get('animal_type', '')
+    
+    if search_query:
+        animals_list = animals_list.filter(
+            Q(cow_name__icontains=search_query) |
+            Q(ear_tag__icontains=search_query) |
+            Q(breed__icontains=search_query)
+        )
+    
+    if animal_type_filter:
+        animals_list = animals_list.filter(animal_type=animal_type_filter)
+    
+    # Pagination
+    paginator = Paginator(animals_list, 10)
+    page_number = request.GET.get('page')
+    animals = paginator.get_page(page_number)
+    
+    context = {
+        'form': form,
+        'animals': animals,
+        'animal': animal,
+        'search_query': search_query,
+        'animal_type_filter': animal_type_filter,
+        'animal_types': Animal.animal_types
+    }
+    return render(request, 'core/animal_records.html', context)
 
 
 def animal_list(request):
@@ -167,6 +194,7 @@ def animal_list(request):
   context = {'animals': animals}  # Create a dictionary for template context
   return render(request, 'core/animal_records.html', context)  # Render the template
 
+@login_required
 def delete_animal_record(request, ear_tag):
     animal_record = Animal.objects.filter(ear_tag=ear_tag).first()
     
@@ -181,43 +209,53 @@ def delete_animal_record(request, ear_tag):
 # ......................................................................................
 # ///////////// MILK RECORDS ///////////////////////////////////////////////////////////
 
+@login_required
 def milk_records(request, record_id=None):
+    milk_record = None
     if record_id:
-        milk_record = MilkRecord.objects.filter(record_id=record_id).first()
-    else:
-        milk_record = None
+        milk_record = get_object_or_404(MilkRecord, record_id=record_id)
 
     if request.method == 'POST':
-        if milk_record is None:
-            milk_record = MilkRecord(record_id=request.POST.get('record_id'))  # Set record_id for new records
+        form = MilkRecordForm(request.POST, instance=milk_record)
+        if form.is_valid():
+            form.save()
+            return redirect('core:milk-records')
+    else:
+        form = MilkRecordForm(instance=milk_record)
 
-        milking_date = request.POST.get('milking_date')
-        cow_name = request.POST.get('cow_name')
-        morning_milk_quantity = request.POST.get('morning_milk_quantity') or 0
-        afternoon_milk_quantity = request.POST.get('afternoon_milk_quantity') or 0
-        evening_milk_quantity = request.POST.get('evening_milk_quantity') or 0
-
-        # Update the fields
-        milk_record.milking_date = milking_date
-        milk_record.cow_name = cow_name
-        milk_record.morning_milk_quantity = float(morning_milk_quantity) 
-        milk_record.afternoon_milk_quantity = float(afternoon_milk_quantity) 
-        milk_record.evening_milk_quantity = float(evening_milk_quantity)
-
-        # Save the record to the database
-        milk_record.save()
-        return redirect('core:milk-records')
-
-    # Fetch all records for display
-    milk_records = MilkRecord.objects.all().order_by('-milking_date')
-    total_quantity = MilkRecord.total_milk_quantity
+    # Search and filter
+    milk_records_list = MilkRecord.objects.all().order_by('-milking_date')
+    search_query = request.GET.get('search', '')
+    date_from = request.GET.get('date_from', '')
+    date_to = request.GET.get('date_to', '')
+    
+    if search_query:
+        milk_records_list = milk_records_list.filter(
+            Q(cow_name__icontains=search_query) |
+            Q(record_id__icontains=search_query)
+        )
+    
+    if date_from:
+        milk_records_list = milk_records_list.filter(milking_date__gte=date_from)
+    if date_to:
+        milk_records_list = milk_records_list.filter(milking_date__lte=date_to)
+    
+    # Pagination
+    paginator = Paginator(milk_records_list, 10)
+    page_number = request.GET.get('page')
+    milk_records_page = paginator.get_page(page_number)
+    
     context = {
-        'milk_records': milk_records,
+        'form': form,
+        'milk_records': milk_records_page,
         'milk_record': milk_record,
-        'total_quantity':total_quantity
+        'search_query': search_query,
+        'date_from': date_from,
+        'date_to': date_to
     }
     return render(request, 'core/milk_records.html', context)
 
+@login_required
 def delete_milk_record(request, record_id):
     milk_record = MilkRecord.objects.filter(record_id=record_id).first()
     
@@ -232,45 +270,55 @@ def delete_milk_record(request, record_id):
 # ......................................................................................
 # ///////////// MILK SALE ///////////////////////////////////////////////////////////
 
-def milk_sale(request):
-    """Creates a new milk sale."""
-    if request.method == 'POST':
-        sale_id = request.POST.get('sale_id')
-        current_date = request.POST.get('current_date')
-        unit_price = request.POST.get('unit_price')
-        client_name = request.POST.get('client_name')
-        client_contact = request.POST.get('client_contact')
-        amount_bought = request.POST.get('amount_bought')
-
-        # Validate input data here (e.g., check if required fields are filled)
-
-        try:
-            unit_price = Decimal(unit_price)
-            amount_bought = float(amount_bought)
-        except (ValueError, TypeError):
-            # Handle invalid input (e.g., show an error message)
-            return render(request, 'milk_sale_create.html', {'error_message': 'Invalid input'})
-
-        milk_sale = MilkSale(
-            sale_id=sale_id,
-            current_date=current_date,
-            unit_price=unit_price,
-            client_name=client_name,
-            client_contact=client_contact,
-            amount_bought=amount_bought
-        )
-        milk_sale.save()
-        return redirect('core:milk-sale')  # Redirect to the dashboard after creation
-    else:
-        
-        milk_sales = MilkSale.objects.all().order_by('-current_date')  # Order by most recent first
-        total_price = MilkSale.total_milk_price
-        context = {
-            'milk_sales': milk_sales,
-            'total_price': total_price
-        }
-        return render(request, 'core/milk_sale.html', context)
+@login_required
+def milk_sale(request, sale_id=None):
+    milk_sale_obj = None
+    if sale_id:
+        milk_sale_obj = get_object_or_404(MilkSale, sale_id=sale_id)
     
+    if request.method == 'POST':
+        form = MilkSaleForm(request.POST, instance=milk_sale_obj)
+        if form.is_valid():
+            sale = form.save(commit=False)
+            sale.total_price = sale.unit_price * Decimal(str(sale.amount_bought))
+            sale.save()
+            return redirect('core:milk-sale')
+    else:
+        form = MilkSaleForm(instance=milk_sale_obj)
+    
+    # Search and filter
+    milk_sales_list = MilkSale.objects.all().order_by('-current_date')
+    search_query = request.GET.get('search', '')
+    date_from = request.GET.get('date_from', '')
+    date_to = request.GET.get('date_to', '')
+    
+    if search_query:
+        milk_sales_list = milk_sales_list.filter(
+            Q(client_name__icontains=search_query) |
+            Q(sale_id__icontains=search_query)
+        )
+    
+    if date_from:
+        milk_sales_list = milk_sales_list.filter(current_date__gte=date_from)
+    if date_to:
+        milk_sales_list = milk_sales_list.filter(current_date__lte=date_to)
+    
+    # Pagination
+    paginator = Paginator(milk_sales_list, 10)
+    page_number = request.GET.get('page')
+    milk_sales = paginator.get_page(page_number)
+    
+    context = {
+        'form': form,
+        'milk_sales': milk_sales,
+        'milk_sale': milk_sale_obj,
+        'search_query': search_query,
+        'date_from': date_from,
+        'date_to': date_to
+    }
+    return render(request, 'core/milk_sale.html', context)
+    
+@login_required
 def delete_sale_record(request, sale_id):
     milk_sale = MilkSale.objects.filter(sale_id=sale_id).first()
     
@@ -286,58 +334,61 @@ def delete_sale_record(request, sale_id):
 # ......................................................................................
 # ///////////// BREEDING INFO ///////////////////////////////////////////////////////////
 
+@login_required
 def breeding(request, breeding_id=None):
+    breeding_obj = None
     if breeding_id:
-        breeding = Breeding.objects.filter(breeding_id=breeding_id).first()
-    else:
-        breeding = None
+        breeding_obj = get_object_or_404(Breeding, breeding_id=breeding_id)
 
     if request.method == 'POST':
-        if breeding is None:
-            breeding = Breeding(
-                breeding_id=request.POST.get('breeding_id')
-            )
-            
-        breeding_id = request.POST.get('breeding_id')
-        heat_date = request.POST.get('heat_date')
-        breeding_date = request.POST.get('breeding_date')
-        bull_name = request.POST.get('bull_name')
-        cow_name = request.POST.get('cow_name')
-        pregnancy_diagnosis_date = request.POST.get('pregnancy_diagnosis_date')
-        date_due_to_calve = request.POST.get('date_due_to_calve')
-        date_calved = request.POST.get('date_calved')
-        age_of_cow_at_calving = request.POST.get('age_of_cow_at_calving')
-        calf_name = request.POST.get('calf_name')
-        calving_notes = request.POST.get('calving_notes')
+        form = BreedingForm(request.POST, instance=breeding_obj)
+        if form.is_valid():
+            form.save()
+            return redirect('core:breeding')
+    else:
+        form = BreedingForm(instance=breeding_obj)
 
-        breeding.heat_date = heat_date
-        breeding.breeding_date = breeding_date
-        breeding.bull_name = bull_name
-        breeding.cow_name = cow_name
-        breeding.pregnancy_diagnosis_date = pregnancy_diagnosis_date
-        breeding.date_due_to_calve = date_due_to_calve
-        breeding.date_calved = date_calved
-        breeding.age_of_cow_at_calving = age_of_cow_at_calving
-        breeding.calf_name = calf_name
-        breeding.calving_notes = calving_notes
+    # Search and filter
+    breedings_list = Breeding.objects.all().order_by('-breeding_date')
+    search_query = request.GET.get('search', '')
+    date_from = request.GET.get('date_from', '')
+    date_to = request.GET.get('date_to', '')
+    
+    if search_query:
+        breedings_list = breedings_list.filter(
+            Q(cow_name__icontains=search_query) |
+            Q(bull_name__icontains=search_query) |
+            Q(calf_name__icontains=search_query)
+        )
+    
+    if date_from:
+        breedings_list = breedings_list.filter(breeding_date__gte=date_from)
+    if date_to:
+        breedings_list = breedings_list.filter(breeding_date__lte=date_to)
+    
+    # Pagination
+    paginator = Paginator(breedings_list, 10)
+    page_number = request.GET.get('page')
+    breedings = paginator.get_page(page_number)
 
-        breeding.save()
-        return redirect('core:breeding')
-
-    breedings = Breeding.objects.all().order_by('-heat_date')  # Order by recent heat date
     context = {
+        'form': form,
         'breedings': breedings,
-        'breeding': breeding
+        'breeding': breeding_obj,
+        'search_query': search_query,
+        'date_from': date_from,
+        'date_to': date_to
     }
     return render(request, 'core/breeding.html', context)
 
-# List all breeding records
+@login_required
 def breeding_list(request):
     breedings = Breeding.objects.all().order_by('-heat_date')  # Order by recent heat date
     context = {'breedings': breedings}
     return render(request, 'core/breeding.html', context)
 
 # Delete a breeding record (consider confirmation or security measures)
+@login_required
 def delete_breeding_record(request, breeding_id):
     breeding_record = Breeding.objects.filter(breeding_id=breeding_id).first()
     
@@ -363,44 +414,52 @@ def breeding_search(request):
 # ......................................................................................
 # ///////////// STOCK FEEDS  ///////////////////////////////////////////////////////////
 
-
-def stock_feeds(request):
-    """
-    Allows creation of a new stock feed entry.
-    """
+@login_required
+def stock_feeds(request, feed_id=None):
+    feed = None
+    if feed_id:
+        feed = get_object_or_404(StockFeed, feed_id=feed_id)
+    
     if request.method == 'POST':
-        def get_date_field(field_name): 
-            field_value = request.POST.get(field_name) 
-            return field_value if field_value else None
-        
-        stock_feeds = StockFeed(
-            feed_id= request.POST.get('feed_id'),
-            feed_type=request.POST['feed_types'],
-            quantity=request.POST['quantity'],
-            unit_of_measurement=request.POST['units'],
-            supplier_name= request.POST['supplier_name'],
-            supplier_contact=request.POST['supplier_contact'],
-            supplier_phone=request.POST['supplier_phone'],
-            purchase_date=request.POST['purchase_date'],
-            expiration_date=request.POST['expiration_date'],
-            cost_per_unit=request.POST['cost_per_unit'],
-            notes=request.POST['notes']
-        )
-        stock_feeds.save()
-        return redirect('core:stock-feeds')
+        form = StockFeedForm(request.POST, instance=feed)
+        if form.is_valid():
+            stock_feed = form.save(commit=False)
+            stock_feed.total_cost = stock_feed.quantity * stock_feed.cost_per_unit
+            stock_feed.save()
+            return redirect('core:stock-feeds')
     else:
-        units = StockFeed.units
-        feed_types = StockFeed.feed_types
-        total_cost = StockFeed.total_feed_cost
-        feeds = StockFeed.objects.all().order_by('-purchase_date')
-        context = {
-            'feeds': feeds,
-            'units': units,
-            'total_cost': total_cost,
-            'feed_types': feed_types  # List of available feed types for dropdown menu in form
-        }
-        return render(request, 'core/stock_feeds.html', context)  # Replace with your template name
+        form = StockFeedForm(instance=feed)
+    
+    # Search and filter
+    feeds_list = StockFeed.objects.all().order_by('-purchase_date')
+    search_query = request.GET.get('search', '')
+    feed_type_filter = request.GET.get('feed_type', '')
+    
+    if search_query:
+        feeds_list = feeds_list.filter(
+            Q(supplier_name__icontains=search_query) |
+            Q(feed_id__icontains=search_query)
+        )
+    
+    if feed_type_filter:
+        feeds_list = feeds_list.filter(feed_type=feed_type_filter)
+    
+    # Pagination
+    paginator = Paginator(feeds_list, 10)
+    page_number = request.GET.get('page')
+    feeds = paginator.get_page(page_number)
+    
+    context = {
+        'form': form,
+        'feeds': feeds,
+        'feed': feed,
+        'search_query': search_query,
+        'feed_type_filter': feed_type_filter,
+        'feed_types': StockFeed.feed_types
+    }
+    return render(request, 'core/stock_feeds.html', context)
 
+@login_required
 def delete_feed_record(request, feed_id):
     feed_record = StockFeed.objects.filter(feed_id=feed_id).first()
     
@@ -414,24 +473,58 @@ def delete_feed_record(request, feed_id):
 # ########################### FARM FINANCE  #########################################
 ###################################################################################
 
-def farm_finance(request):
+@login_required
+def farm_finance(request, finance_id=None):
+    finance = None
+    if finance_id:
+        finance = get_object_or_404(FarmFinance, finance_id=finance_id)
+    
     if request.method == 'POST':
-        farm_finance = FarmFinance(
-            date_incurred=request.POST.get('date_incurred'),
-            expense_type=request.POST.get('expense_types'),
-            amount_incurred=request.POST.get('amount_incurred')
-        )
-        farm_finance.save()
-        return redirect('core:farm-finance')
+        form = FarmFinanceForm(request.POST, instance=finance)
+        if form.is_valid():
+            form.save()
+            return redirect('core:farm-finance')
     else:
-        expense_types = FarmFinance.expense_types
-        farm_finances = FarmFinance.objects.all().order_by('-date_incurred')
-        context = {
-            'farm_finances': farm_finances, 
-            'expense_types': expense_types
-        }
-        return render(request, 'core/farm_finance.html', context)
+        form = FarmFinanceForm(instance=finance)
+    
+    # Search and filter
+    farm_finances_list = FarmFinance.objects.all().order_by('-date_incurred')
+    search_query = request.GET.get('search', '')
+    expense_type_filter = request.GET.get('expense_type', '')
+    date_from = request.GET.get('date_from', '')
+    date_to = request.GET.get('date_to', '')
+    
+    if search_query:
+        farm_finances_list = farm_finances_list.filter(
+            Q(finance_id__icontains=search_query)
+        )
+    
+    if expense_type_filter:
+        farm_finances_list = farm_finances_list.filter(expense_type=expense_type_filter)
+    
+    if date_from:
+        farm_finances_list = farm_finances_list.filter(date_incurred__gte=date_from)
+    if date_to:
+        farm_finances_list = farm_finances_list.filter(date_incurred__lte=date_to)
+    
+    # Pagination
+    paginator = Paginator(farm_finances_list, 10)
+    page_number = request.GET.get('page')
+    farm_finances = paginator.get_page(page_number)
+    
+    context = {
+        'form': form,
+        'farm_finances': farm_finances,
+        'finance': finance,
+        'search_query': search_query,
+        'expense_type_filter': expense_type_filter,
+        'date_from': date_from,
+        'date_to': date_to,
+        'expense_types': FarmFinance.expense_types
+    }
+    return render(request, 'core/farm_finance.html', context)
       
+@login_required
 def delete_finance_record(request, finance_id):
     finance_record = FarmFinance.objects.filter(finance_id=finance_id).first()
     
@@ -443,28 +536,51 @@ def delete_finance_record(request, finance_id):
         
 # ########################### EMPLOYEES   #########################################
 ###################################################################################
-def employee(request):
+@login_required
+def employee(request, employee_id=None):
+    emp = None
+    if employee_id:
+        emp = get_object_or_404(Employee, employee_id=employee_id)
+    
     if request.method == 'POST':
-        employee = Employee(
-            employee_id=request.POST['employee_id'],
-            employee_name=request.POST['employee_name'],
-            gender=request.POST['gender'],
-            phone_number=request.POST['phone_number'],
-            address=request.POST['address'],
-            designation=request.POST['designation_type'],
-            date_hired=request.POST['date_hired'],
-        )
-        employee.save()
-        return redirect('core:employee')
+        form = EmployeeForm(request.POST, instance=emp)
+        if form.is_valid():
+            form.save()
+            return redirect('core:employee')
     else:
-        designation_type = Employee.designation_type
-        employees = Employee.objects.all().order_by('-date_hired')  # Get all farm finances from the database
-        context = {
-            'employees': employees,
-            'designation_type': designation_type,  # Get all designation types from the database
-        }
-        return render(request, 'core/employees.html', context)
+        form = EmployeeForm(instance=emp)
+    
+    # Search and filter
+    employees_list = Employee.objects.all().order_by('-date_hired')
+    search_query = request.GET.get('search', '')
+    designation_filter = request.GET.get('designation', '')
+    
+    if search_query:
+        employees_list = employees_list.filter(
+            Q(employee_name__icontains=search_query) |
+            Q(employee_id__icontains=search_query) |
+            Q(phone_number__icontains=search_query)
+        )
+    
+    if designation_filter:
+        employees_list = employees_list.filter(designation=designation_filter)
+    
+    # Pagination
+    paginator = Paginator(employees_list, 10)
+    page_number = request.GET.get('page')
+    employees = paginator.get_page(page_number)
+    
+    context = {
+        'form': form,
+        'employees': employees,
+        'employee': emp,
+        'search_query': search_query,
+        'designation_filter': designation_filter,
+        'designation_type': Employee.designation_type
+    }
+    return render(request, 'core/employees.html', context)
 
+@login_required
 def delete_employee_record(request, employee_id):
     employee_record = Employee.objects.filter(employee_id=employee_id).first()
     

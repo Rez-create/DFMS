@@ -143,6 +143,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = "userauths.User"
 
+LOGIN_URL = 'userauths:sign-in'
+LOGIN_REDIRECT_URL = 'core:index'
+LOGOUT_REDIRECT_URL = 'userauths:sign-in'
+
 
 JAZZMIN_SETTINGS = {
     'site_header': "S.D Farm",

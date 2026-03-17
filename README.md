@@ -50,11 +50,4 @@ python manage.py runserver
 7. Access the application at `http://127.0.0.1:8000/`
 
 
-## Technologies Used
-
-- **Backend**: Django 5.1.1
-- **Database**: PostgreSQL
-- **Frontend**: Bootstrap, ApexCharts
-- **Admin**: Django Jazzmin
-- **Authentication**: Django Auth
 

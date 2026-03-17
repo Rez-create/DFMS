@@ -156,6 +156,9 @@
 
   <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   <!-- General JS -->
   <script src="{% static 'js/app.min.js' %}"></script>
   <!-- DataTables JS -->
@@ -182,5 +185,41 @@
   </script>
 
   {% block extra_js %}{% endblock %}
+
+  <script>
+    function downloadPDF(tableId, title) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'landscape' });
+      const now = new Date().toLocaleDateString();
+      doc.setFontSize(14);
+      doc.text('Dairy Farm - ' + title, 14, 15);
+      doc.setFontSize(9);
+      doc.text('Generated: ' + now, 14, 22);
+
+      const table = document.getElementById(tableId);
+      const allHeaders = Array.from(table.querySelectorAll('thead tr th'));
+      const actionColIndex = allHeaders.findIndex(th => th.innerText.trim() === 'Actions');
+      const headers = allHeaders.filter((_, i) => i !== actionColIndex).map(th => th.innerText.trim());
+
+      const rows = [];
+      // Use DataTable API to get all rows across all pages
+      const dt = $("#" + tableId).DataTable();
+      dt.rows().every(function() {
+        const node = this.node();
+        const cells = Array.from(node.querySelectorAll('td'));
+        if (cells.length <= 1) return;
+        rows.push(cells.filter((_, i) => i !== actionColIndex).map(td => td.innerText.trim()));
+      });
+
+      doc.autoTable({
+        head: [headers],
+        body: rows,
+        startY: 27,
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [41, 128, 185] }
+      });
+      doc.save(title.replace(/ /g, '_') + '_' + now.replace(/\//g, '-') + '.pdf');
+    }
+  </script>
 </body>
 </html>

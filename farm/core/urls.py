@@ -36,6 +36,9 @@ urlpatterns = [
     path("farm_finance/<str:finance_id>/edit/", views.farm_finance, name='finance-records-edit'),
     path('farm_finance/<str:finance_id>/delete/', views.delete_finance_record, name='finance-records-delete'),
     
+    # autocomplete
+    path("autocomplete/cow/", views.autocomplete_cow, name="autocomplete-cow"),
+
     # employee view urls
     path("employee/", views.employee, name="employee"),
     path("employee/<str:employee_id>/edit/", views.employee, name='employee-records-edit'),

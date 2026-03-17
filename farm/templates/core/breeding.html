@@ -41,9 +41,10 @@
                 </div>
                 <div class="row">
                   <div class="col-md-6">
-                    <div class="form-group">
+                    <div class="form-group" style="position:relative;">
                       <label>Cow Name</label>
-                      <input type="text" name="cow_name" class="form-control" value="{{ breeding.cow_name|default:'' }}" placeholder="e.g. Daisy" required>
+                      <input type="text" name="cow_name" id="id_cow_name_breeding" class="form-control" value="{{ breeding.cow_name|default:'' }}" placeholder="Search or select cow..." autocomplete="off">
+                      <ul id="cow-suggestions-breeding" class="list-group position-absolute shadow" style="z-index:1050;width:100%;display:none;max-height:200px;overflow-y:auto;background:#fff;border:1px solid #ced4da;"></ul>
                     </div>
                   </div>
                   <div class="col-md-6">
@@ -163,6 +164,49 @@
 
 {% block extra_js %}
 <script>
+  const cowAutocompleteUrl = "{% url 'core:autocomplete-cow' %}";
+
+  function setupCowAutocomplete(inputId, listId) {
+    const input = document.getElementById(inputId);
+    const list = document.getElementById(listId);
+
+    function loadSuggestions(q) {
+      fetch(cowAutocompleteUrl + '?q=' + encodeURIComponent(q))
+        .then(r => r.json())
+        .then(names => {
+          list.innerHTML = '';
+          if (!names.length) {
+            const li = document.createElement('li');
+            li.className = 'list-group-item text-muted';
+            li.textContent = 'No cows found';
+            list.appendChild(li);
+          } else {
+            names.forEach(name => {
+              const li = document.createElement('li');
+              li.className = 'list-group-item list-group-item-action py-2';
+              li.style.cssText = 'cursor:pointer;background:#fff;';
+              li.textContent = name;
+              li.addEventListener('mouseover', () => li.style.background = '#e8f4fd');
+              li.addEventListener('mouseout', () => li.style.background = '#fff');
+              li.addEventListener('mousedown', e => {
+                e.preventDefault();
+                input.value = name;
+                list.style.display = 'none';
+              });
+              list.appendChild(li);
+            });
+          }
+          list.style.display = 'block';
+        });
+    }
+
+    input.addEventListener('focus', () => loadSuggestions(input.value.trim()));
+    input.addEventListener('input', () => loadSuggestions(input.value.trim()));
+    input.addEventListener('blur', () => setTimeout(() => list.style.display = 'none', 200));
+  }
+
+  setupCowAutocomplete('id_cow_name_breeding', 'cow-suggestions-breeding');
+
   $(document).ready(function() {
     $('#breedingTable').DataTable({
       "order": [[3, "desc"]],

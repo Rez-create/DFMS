@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, JsonResponse
 from decimal import Decimal
 from django.shortcuts import render, redirect
 from django.utils import timezone
@@ -245,13 +245,15 @@ def milk_records(request, record_id=None):
     page_number = request.GET.get('page')
     milk_records_page = paginator.get_page(page_number)
     
+    cows = Animal.objects.filter(animal_type='Cow').values_list('cow_name', flat=True).order_by('cow_name')
     context = {
         'form': form,
         'milk_records': milk_records_page,
         'milk_record': milk_record,
         'search_query': search_query,
         'date_from': date_from,
-        'date_to': date_to
+        'date_to': date_to,
+        'cows': cows,
     }
     return render(request, 'core/milk_records.html', context)
 
@@ -371,13 +373,15 @@ def breeding(request, breeding_id=None):
     page_number = request.GET.get('page')
     breedings = paginator.get_page(page_number)
 
+    cows = Animal.objects.filter(animal_type='Cow').values_list('cow_name', flat=True).order_by('cow_name')
     context = {
         'form': form,
         'breedings': breedings,
         'breeding': breeding_obj,
         'search_query': search_query,
         'date_from': date_from,
-        'date_to': date_to
+        'date_to': date_to,
+        'cows': cows,
     }
     return render(request, 'core/breeding.html', context)
 
@@ -590,3 +594,12 @@ def delete_employee_record(request, employee_id):
     
     return render(request, 'delete/employeedelete.html', {'employee_record': employee_record})      
      
+
+@login_required
+def autocomplete_cow(request):
+    q = request.GET.get('q', '')
+    qs = Animal.objects.filter(animal_type='Cow')
+    if q:
+        qs = qs.filter(cow_name__icontains=q)
+    names = qs.values_list('cow_name', flat=True).distinct().order_by('cow_name')
+    return JsonResponse(list(names), safe=False)

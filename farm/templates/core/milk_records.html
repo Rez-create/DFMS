@@ -25,6 +25,12 @@
             <div class="card-body">
               <form method="POST">
                 {% csrf_token %}
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                  {% for field in form %}{% for error in field.errors %}<div>{{ field.label }}: {{ error }}</div>{% endfor %}{% endfor %}
+                  {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+                </div>
+                {% endif %}
                 <div class="form-group">
                   <label>Milking Date</label>
                   <input type="date" name="milking_date" class="form-control" value="{{ milk_record.milking_date|date:'Y-m-d'|default:'' }}" required>

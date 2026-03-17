@@ -49,11 +49,24 @@ class Animal(models.Model):
         ('Cow', 'Cow'),
         ('Calf', 'Calf'),
     ]
+
+    breed_choices = [
+        ('Friesian', 'Friesian'),
+        ('Holstein', 'Holstein'),
+        ('Jersey', 'Jersey'),
+        ('Ayrshire', 'Ayrshire'),
+        ('Guernsey', 'Guernsey'),
+        ('Brown Swiss', 'Brown Swiss'),
+        ('Sahiwal', 'Sahiwal'),
+        ('Zebu', 'Zebu'),
+        ('Crossbreed', 'Crossbreed'),
+        ('Other', 'Other'),
+    ]
     
     ear_tag = ShortUUIDField(unique=True, primary_key=True, length=3, max_length=20, alphabet="ABCDEFGHIJKLMNOPQRSTUVWXYZO123456789")
     cow_name = models.CharField(max_length=100)
     animal_type = models.CharField(max_length=10, default="Cow", choices=animal_types)
-    breed = models.CharField(max_length=50)
+    breed = models.CharField(max_length=50, choices=breed_choices)
     color = models.CharField(max_length=30)
     birth_date = models.DateField()
 

@@ -10,7 +10,16 @@ class AnimalForm(forms.ModelForm):
         widgets = {
             'birth_date': forms.DateInput(attrs={'type': 'date'}),
         }
-    
+
+    def clean_ear_tag(self):
+        ear_tag = self.cleaned_data.get('ear_tag')
+        qs = Animal.objects.filter(ear_tag=ear_tag)
+        if self.instance and self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise forms.ValidationError('An animal with this ear tag already exists.')
+        return ear_tag
+
     def clean_birth_date(self):
         birth_date = self.cleaned_data.get('birth_date')
         if birth_date and birth_date > date.today():
@@ -20,7 +29,7 @@ class AnimalForm(forms.ModelForm):
 class MilkRecordForm(forms.ModelForm):
     class Meta:
         model = MilkRecord
-        fields = '__all__'
+        exclude = ['record_id']
         widgets = {
             'milking_date': forms.DateInput(attrs={'type': 'date'}),
         }
@@ -38,7 +47,7 @@ class MilkRecordForm(forms.ModelForm):
 class MilkSaleForm(forms.ModelForm):
     class Meta:
         model = MilkSale
-        fields = '__all__'
+        exclude = ['sale_id', 'total_price']
         widgets = {
             'current_date': forms.DateInput(attrs={'type': 'date'}),
         }
@@ -58,7 +67,7 @@ class MilkSaleForm(forms.ModelForm):
 class BreedingForm(forms.ModelForm):
     class Meta:
         model = Breeding
-        fields = '__all__'
+        exclude = ['breeding_id']
         widgets = {
             'heat_date': forms.DateInput(attrs={'type': 'date'}),
             'breeding_date': forms.DateInput(attrs={'type': 'date'}),
@@ -70,7 +79,7 @@ class BreedingForm(forms.ModelForm):
 class StockFeedForm(forms.ModelForm):
     class Meta:
         model = StockFeed
-        fields = '__all__'
+        exclude = ['feed_id', 'total_cost']
         widgets = {
             'purchase_date': forms.DateInput(attrs={'type': 'date'}),
             'expiration_date': forms.DateInput(attrs={'type': 'date'}),
@@ -85,7 +94,7 @@ class StockFeedForm(forms.ModelForm):
 class FarmFinanceForm(forms.ModelForm):
     class Meta:
         model = FarmFinance
-        fields = '__all__'
+        exclude = ['finance_id']
         widgets = {
             'date_incurred': forms.DateInput(attrs={'type': 'date'}),
         }

@@ -29,10 +29,10 @@
                   <div class="col-md-6">
                     <div class="form-group">
                       <label>Feed Type</label>
-                      <select name="feed_types" class="form-control" required>
+                      <select name="feed_type" class="form-control" required>
                         <option value="">-- Select --</option>
                         {% for value, label in feed_types %}
-                        <option value="{{ value }}">{{ label }}</option>
+                        <option value="{{ value }}" {% if feed.feed_type == value %}selected{% endif %}>{{ label }}</option>
                         {% endfor %}
                       </select>
                     </div>
@@ -46,10 +46,10 @@
                 </div>
                 <div class="form-group">
                   <label>Unit of Measurement</label>
-                  <select name="units" class="form-control" required>
+                  <select name="unit_of_measurement" class="form-control" required>
                     <option value="">-- Select --</option>
                     {% for value, label in units %}
-                    <option value="{{ value }}">{{ label }}</option>
+                    <option value="{{ value }}" {% if feed.unit_of_measurement == value %}selected{% endif %}>{{ label }}</option>
                     {% endfor %}
                   </select>
                 </div>

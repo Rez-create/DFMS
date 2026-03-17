@@ -20,29 +20,35 @@
         <div class="col-12 col-md-5 col-lg-4">
           <div class="card">
             <div class="card-header">
-              <h4>Add Employee</h4>
+              <h4>{% if employee %}Edit Employee{% else %}Add Employee{% endif %}</h4>
             </div>
             <div class="card-body">
               <form method="POST">
                 {% csrf_token %}
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                  {% for field in form %}{% for error in field.errors %}<div>{{ field.label }}: {{ error }}</div>{% endfor %}{% endfor %}
+                  {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+                </div>
+                {% endif %}
                 <div class="form-group">
-                  <label>Employee ID</label>
-                  <input type="text" name="employee_id" class="form-control" placeholder="e.g. EMP001" required>
+                  <label>Employee ID No.</label>
+                  <input type="text" name="employee_id" class="form-control" value="{{ employee.employee_id|default:'' }}" placeholder="ID Number" {% if employee %}readonly{% endif %} required>
                 </div>
                 <div class="form-group">
                   <label>Full Name</label>
-                  <input type="text" name="employee_name" class="form-control" placeholder="e.g. Jane Wanjiku" required>
+                  <input type="text" name="employee_name" class="form-control" value="{{ employee.employee_name|default:'' }}" placeholder="e.g. Jane" required>
                 </div>
                 <div class="form-group">
                   <label>Gender</label>
                   <div class="mt-2">
                     <label class="custom-switch mr-3">
-                      <input type="radio" name="gender" value="MALE" class="custom-switch-input" checked>
+                      <input type="radio" name="gender" value="MALE" class="custom-switch-input" {% if not employee or employee.gender == 'MALE' %}checked{% endif %}>
                       <span class="custom-switch-indicator"></span>
                       <span class="custom-switch-description">Male</span>
                     </label>
                     <label class="custom-switch">
-                      <input type="radio" name="gender" value="FEMALE" class="custom-switch-input">
+                      <input type="radio" name="gender" value="FEMALE" class="custom-switch-input" {% if employee.gender == 'FEMALE' %}checked{% endif %}>
                       <span class="custom-switch-indicator"></span>
                       <span class="custom-switch-description">Female</span>
                     </label>
@@ -50,27 +56,32 @@
                 </div>
                 <div class="form-group">
                   <label>Phone Number</label>
-                  <input type="text" name="phone_number" class="form-control" placeholder="e.g. 0712345678" required>
+                  <input type="text" name="phone_number" class="form-control" value="{{ employee.phone_number|default:'' }}" placeholder="e.g. 0712345678" required>
                 </div>
                 <div class="form-group">
                   <label>Address</label>
-                  <textarea name="address" class="form-control" rows="2" placeholder="Postal/Physical address" required></textarea>
+                  <textarea name="address" class="form-control" rows="2" placeholder="Physical address" required>{{ employee.address|default:'' }}</textarea>
                 </div>
                 <div class="form-group">
                   <label>Designation</label>
-                  <select name="designation_type" class="form-control" required>
+                  <select name="designation" class="form-control" required>
                     <option value="">-- Select Role --</option>
                     {% for value, label in designation_type %}
-                    <option value="{{ value }}">{{ label }}</option>
+                    <option value="{{ value }}" {% if employee.designation == value %}selected{% endif %}>{{ label }}</option>
                     {% endfor %}
                   </select>
                 </div>
                 <div class="form-group">
                   <label>Date Hired</label>
-                  <input type="date" name="date_hired" class="form-control" required>
+                  <input type="date" name="date_hired" class="form-control" value="{{ employee.date_hired|date:'Y-m-d'|default:'' }}" required>
                 </div>
                 <div class="card-footer text-right">
-                  <button type="submit" class="btn btn-save">Save Employee</button>
+                  {% if employee %}
+                    <button type="submit" class="btn btn-update">Update</button>
+                    <a href="{% url 'core:employee' %}" class="btn btn-cancel">Cancel</a>
+                  {% else %}
+                    <button type="submit" class="btn btn-save">Save Employee</button>
+                  {% endif %}
                 </div>
               </form>
             </div>
@@ -109,6 +120,7 @@
                       </td>
                       <td>{{ emp.date_hired|date:"M d, Y" }}</td>
                       <td>
+                        <a href="{% url 'core:employee-records-edit' emp.employee_id %}" class="btn btn-action btn-edit" title="Edit"><i class="fas fa-edit"></i></a>
                         <a href="{% url 'core:employee-records-delete' emp.employee_id %}" class="btn btn-action btn-del" title="Delete"><i class="fas fa-trash"></i></a>
                       </td>
                     </tr>

@@ -20,30 +20,41 @@
         <div class="col-12 col-md-5 col-lg-4">
           <div class="card">
             <div class="card-header">
-              <h4>Record Expense</h4>
+              <h4>{% if finance %}Edit Expense{% else %}Record Expense{% endif %}</h4>
             </div>
             <div class="card-body">
               <form method="POST">
                 {% csrf_token %}
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                  {% for field in form %}{% for error in field.errors %}<div>{{ field.label }}: {{ error }}</div>{% endfor %}{% endfor %}
+                  {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+                </div>
+                {% endif %}
                 <div class="form-group">
                   <label>Date Incurred</label>
-                  <input type="date" name="date_incurred" class="form-control" required>
+                  <input type="date" name="date_incurred" class="form-control" value="{{ finance.date_incurred|date:'Y-m-d'|default:'' }}" required>
                 </div>
                 <div class="form-group">
                   <label>Expense Type</label>
-                  <select name="expense_types" class="form-control" required>
+                  <select name="expense_type" class="form-control" required>
                     <option value="">-- Select Type --</option>
                     {% for value, label in expense_types %}
-                    <option value="{{ value }}">{{ label }}</option>
+                    <option value="{{ value }}" {% if finance.expense_type == value %}selected{% endif %}>{{ label }}</option>
                     {% endfor %}
                   </select>
                 </div>
                 <div class="form-group">
                   <label>Amount (KES)</label>
-                  <input type="number" step="0.01" name="amount_incurred" class="form-control" placeholder="0.00" required>
+                  <input type="number" step="0.01" name="amount_incurred" class="form-control" value="{{ finance.amount_incurred|default:'' }}" placeholder="0.00" required>
                 </div>
                 <div class="card-footer text-right">
-                  <button type="submit" class="btn btn-save">Save Expense</button>
+                  {% if finance %}
+                    <button type="submit" class="btn btn-update">Update</button>
+                    <a href="{% url 'core:farm-finance' %}" class="btn btn-cancel">Cancel</a>
+                  {% else %}
+                    <button type="submit" class="btn btn-save">Save Expense</button>
+                  {% endif %}
                 </div>
               </form>
             </div>
@@ -78,6 +89,7 @@
                       </td>
                       <td><strong>{{ finance.amount_incurred }}</strong></td>
                       <td>
+                        <a href="{% url 'core:finance-records-edit' finance.finance_id %}" class="btn btn-action btn-edit" title="Edit"><i class="fas fa-edit"></i></a>
                         <a href="{% url 'core:finance-records-delete' finance.finance_id %}" class="btn btn-action btn-del" title="Delete"><i class="fas fa-trash"></i></a>
                       </td>
                     </tr>

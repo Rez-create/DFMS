@@ -184,7 +184,8 @@ def animal_records(request, ear_tag=None):
         'animal': animal,
         'search_query': search_query,
         'animal_type_filter': animal_type_filter,
-        'animal_types': Animal.animal_types
+        'animal_types': Animal.animal_types,
+        'breed_choices': Animal.breed_choices,
     }
     return render(request, 'core/animal_records.html', context)
 
@@ -459,7 +460,8 @@ def stock_feeds(request, feed_id=None):
         'feed': feed,
         'search_query': search_query,
         'feed_type_filter': feed_type_filter,
-        'feed_types': StockFeed.feed_types
+        'feed_types': StockFeed.feed_types,
+        'units': StockFeed.units,
     }
     return render(request, 'core/stock_feeds.html', context)
 

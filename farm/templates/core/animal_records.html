@@ -133,15 +133,13 @@
 {% endblock content %}
 
 {% block extra_js %}
-<style>
-  #animalTable tbody tr:hover { background-color: #f0f7ff; }
-</style>
 <script>
   $(document).ready(function() {
     $('#animalTable').DataTable({
       "order": [[1, "asc"]],
       "pageLength": 10,
-      "language": { "emptyTable": "No animals registered" }
+      "language": { "emptyTable": "No animals registered" },
+      "columnDefs": [{ "orderable": false, "targets": -1 }]
     });
   });
 </script>

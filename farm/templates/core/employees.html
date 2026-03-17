@@ -146,7 +146,8 @@
     $('#employeeTable').DataTable({
       "order": [[5, "desc"]],
       "pageLength": 10,
-      "language": { "emptyTable": "No employees found" }
+      "language": { "emptyTable": "No employees found" },
+      "columnDefs": [{ "orderable": false, "targets": -1 }]
     });
   });
 </script>

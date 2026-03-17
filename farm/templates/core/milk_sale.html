@@ -122,7 +122,8 @@
     $('#milkSaleTable').DataTable({
       "order": [[1, "desc"]],
       "pageLength": 10,
-      "language": { "emptyTable": "No milk sales found" }
+      "language": { "emptyTable": "No milk sales found" },
+      "columnDefs": [{ "orderable": false, "targets": -1 }]
     });
   });
 </script>

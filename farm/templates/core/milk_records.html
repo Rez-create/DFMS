@@ -166,7 +166,8 @@
     $('#milkRecordsTable').DataTable({
       "order": [[2, "desc"]],
       "pageLength": 10,
-      "language": { "emptyTable": "No milk records found" }
+      "language": { "emptyTable": "No milk records found" },
+      "columnDefs": [{ "orderable": false, "targets": -1 }]
     });
   });
 </script>

@@ -115,7 +115,8 @@
     $('#financeTable').DataTable({
       "order": [[1, "desc"]],
       "pageLength": 10,
-      "language": { "emptyTable": "No expenses recorded" }
+      "language": { "emptyTable": "No expenses recorded" },
+      "columnDefs": [{ "orderable": false, "targets": -1 }]
     });
   });
 </script>

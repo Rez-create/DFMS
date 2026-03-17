@@ -20,7 +20,7 @@
         <div class="col-12 col-lg-5">
           <div class="card">
             <div class="card-header">
-              <h4>Add Feed Entry</h4>
+              <h4>{% if feed %}Edit Feed Entry{% else %}Add Feed Entry{% endif %}</h4>
             </div>
             <div class="card-body">
               <form method="POST">
@@ -40,7 +40,7 @@
                   <div class="col-md-6">
                     <div class="form-group">
                       <label>Quantity</label>
-                      <input type="number" step="0.01" name="quantity" class="form-control" placeholder="0.00" required>
+                      <input type="number" step="0.01" name="quantity" class="form-control" value="{{ feed.quantity|default:'' }}" placeholder="0.00" required>
                     </div>
                   </div>
                 </div>
@@ -57,44 +57,49 @@
                   <div class="col-md-6">
                     <div class="form-group">
                       <label>Supplier Name</label>
-                      <input type="text" name="supplier_name" class="form-control" placeholder="e.g. MkulimaFeed" required>
+                      <input type="text" name="supplier_name" class="form-control" value="{{ feed.supplier_name|default:'' }}" placeholder="e.g. MkulimaFeed" required>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-group">
                       <label>Contact Person</label>
-                      <input type="text" name="supplier_contact" class="form-control" placeholder="Contact name">
+                      <input type="text" name="supplier_contact" class="form-control" value="{{ feed.supplier_contact|default:'' }}" placeholder="Contact name">
                     </div>
                   </div>
                 </div>
                 <div class="form-group">
                   <label>Supplier Phone</label>
-                  <input type="text" name="supplier_phone" class="form-control" placeholder="e.g. 0712345678">
+                  <input type="text" name="supplier_phone" class="form-control" value="{{ feed.supplier_phone|default:'' }}" placeholder="e.g. 0712345678">
                 </div>
                 <div class="row">
                   <div class="col-md-6">
                     <div class="form-group">
                       <label>Purchase Date</label>
-                      <input type="date" name="purchase_date" class="form-control" required>
+                      <input type="date" name="purchase_date" class="form-control" value="{{ feed.purchase_date|date:'Y-m-d'|default:'' }}" required>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-group">
                       <label>Expiry Date</label>
-                      <input type="date" name="expiration_date" class="form-control">
+                      <input type="date" name="expiration_date" class="form-control" value="{{ feed.expiration_date|date:'Y-m-d'|default:'' }}">
                     </div>
                   </div>
                 </div>
                 <div class="form-group">
                   <label>Cost per Unit (KES)</label>
-                  <input type="number" step="0.01" name="cost_per_unit" class="form-control" placeholder="0.00" required>
+                  <input type="number" step="0.01" name="cost_per_unit" class="form-control" value="{{ feed.cost_per_unit|default:'' }}" placeholder="0.00" required>
                 </div>
                 <div class="form-group">
                   <label>Notes</label>
-                  <textarea name="notes" class="form-control" rows="2" placeholder="Optional notes..."></textarea>
+                  <textarea name="notes" class="form-control" rows="2" placeholder="Optional notes...">{{ feed.notes|default:'' }}</textarea>
                 </div>
                 <div class="card-footer text-right">
-                  <button type="submit" class="btn btn-save">Save Feed</button>
+                  {% if feed %}
+                    <button type="submit" class="btn btn-update">Update</button>
+                    <a href="{% url 'core:stock-feeds' %}" class="btn btn-cancel">Cancel</a>
+                  {% else %}
+                    <button type="submit" class="btn btn-save">Save Feed</button>
+                  {% endif %}
                 </div>
               </form>
             </div>
@@ -138,6 +143,7 @@
                       <td>{{ feed.cost_per_unit }}</td>
                       <td><strong>{{ feed.total_feed_cost }}</strong></td>
                       <td>
+                        <a href="{% url 'core:feed-records-edit' feed.feed_id %}" class="btn btn-action btn-edit" title="Edit"><i class="fas fa-edit"></i></a>
                         <a href="{% url 'core:feed-records-delete' feed.feed_id %}" class="btn btn-action btn-del" title="Delete"><i class="fas fa-trash"></i></a>
                       </td>
                     </tr>
@@ -163,7 +169,8 @@
       "order": [[5, "desc"]],
       "pageLength": 10,
       "language": { "emptyTable": "No stock feed entries found" },
-      "scrollX": true
+      "scrollX": true,
+      "columnDefs": [{ "orderable": false, "targets": -1 }]
     });
   });
 </script>

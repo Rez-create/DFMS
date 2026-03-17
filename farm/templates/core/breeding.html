@@ -212,7 +212,8 @@
     $('#breedingTable').DataTable({
       "order": [[3, "desc"]],
       "pageLength": 10,
-      "language": { "emptyTable": "No breeding records found" }
+      "language": { "emptyTable": "No breeding records found" },
+      "columnDefs": [{ "orderable": false, "targets": -1 }]
     });
   });
 </script>

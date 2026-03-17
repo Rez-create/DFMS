@@ -113,6 +113,11 @@ body {
   background-color: #f8f9fe !important;
 }
 
+.dataTable tbody tr:hover .btn-action {
+  opacity: 1;
+  visibility: visible;
+}
+
 .dataTable tbody tr.odd {
   background-color: #fff;
 }
@@ -160,11 +165,20 @@ body {
   border-radius: 4px;
   padding: 0;
   font-size: 14px;
-  transition: all 0.15s ease;
+  transition: transform 0.15s ease;
+  position: relative;
+  z-index: 10;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
 }
 
 .btn-action:hover {
   transform: scale(1.1);
+}
+
+td:last-child {
+  white-space: nowrap;
 }
 
 .btn-edit {
@@ -173,9 +187,9 @@ body {
   color: #fff;
 }
 
-.btn-edit:hover {
-  background-color: #2da4d8;
-  color: #fff;
+.btn-edit:hover, .btn-edit:focus, .btn-edit:active {
+  background-color: #2da4d8 !important;
+  color: #fff !important;
 }
 
 .btn-del {
@@ -184,9 +198,9 @@ body {
   color: #fff;
 }
 
-.btn-del:hover {
-  background-color: #e0392f;
-  color: #fff;
+.btn-del:hover, .btn-del:focus, .btn-del:active {
+  background-color: #e0392f !important;
+  color: #fff !important;
 }
 
 /* ---- Form Styling ---- */
@@ -221,6 +235,15 @@ select.form-control {
   padding: 15px 24px;
 }
 
+/* Override Stisla's global btn hover that turns all buttons white */
+.btn-save:hover, .btn-save:focus, .btn-save:active,
+.btn-update:hover, .btn-update:focus, .btn-update:active,
+.btn-cancel:hover, .btn-cancel:focus, .btn-cancel:active,
+.btn-edit:hover, .btn-edit:focus, .btn-edit:active,
+.btn-del:hover, .btn-del:focus, .btn-del:active {
+  background-color: inherit;
+}
+
 /* Form Buttons */
 .btn-save {
   background-color: #47c363;
@@ -231,10 +254,10 @@ select.form-control {
   border-radius: 4px;
 }
 
-.btn-save:hover {
-  background-color: #3dae56;
-  border-color: #3dae56;
-  color: #fff;
+.btn-save:hover, .btn-save:focus, .btn-save:active {
+  background-color: #3dae56 !important;
+  border-color: #3dae56 !important;
+  color: #fff !important;
 }
 
 .btn-update {
@@ -246,10 +269,10 @@ select.form-control {
   border-radius: 4px;
 }
 
-.btn-update:hover {
-  background-color: #394eea;
-  border-color: #394eea;
-  color: #fff;
+.btn-update:hover, .btn-update:focus, .btn-update:active {
+  background-color: #394eea !important;
+  border-color: #394eea !important;
+  color: #fff !important;
 }
 
 .btn-cancel {
@@ -261,10 +284,10 @@ select.form-control {
   border-radius: 4px;
 }
 
-.btn-cancel:hover {
-  background-color: #b8bfc6;
-  border-color: #b8bfc6;
-  color: #34395e;
+.btn-cancel:hover, .btn-cancel:focus, .btn-cancel:active {
+  background-color: #b8bfc6 !important;
+  border-color: #b8bfc6 !important;
+  color: #34395e !important;
 }
 
 /* ---- Delete Confirmation ---- */
